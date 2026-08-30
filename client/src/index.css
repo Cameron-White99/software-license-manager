@@ -47,6 +47,11 @@ body {
   color: #263f80;
 }
 
+.role-pill.user {
+  background: #dcefe1;
+  color: #16803c;
+}
+
 .content {
   display: flex;
   justify-content: center;
