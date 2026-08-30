@@ -11,3 +11,10 @@ export function requireRole(role) {
     next();
   };
 }
+
+// R1: the identity of the submitting User. Same simulation as the role header —
+// with real auth this would come from the session/JWT rather than the client.
+// Controllers must still validate it (see requestController.js).
+export function getUserId(req) {
+  return req.header("x-user-id");
+}
