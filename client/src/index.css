@@ -1,0 +1,130 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+  background: #f2f2f5;
+  color: #1a1a1a;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e6;
+}
+
+.header .logo {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.header nav a {
+  font-size: 13px;
+  color: #4d4d59;
+  text-decoration: none;
+}
+
+.role-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.role-pill.admin {
+  background: #d9e0f2;
+  color: #263f80;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  padding-top: 56px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  width: 360px;
+}
+
+.card h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.field input.error {
+  border-color: #dc2626;
+}
+
+.field .error-text {
+  color: #dc2626;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+button.primary {
+  width: 100%;
+  padding: 10px 20px;
+  background: #2463eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.banner {
+  background: #ffe5e5;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.success-text {
+  color: #16803c;
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: center;
+}
