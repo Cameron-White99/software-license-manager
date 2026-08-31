@@ -1,0 +1,42 @@
+name: CI
+
+# Build check and RBAC audit on every push and pull request.
+# No deployment: deploying to EC2 is a manual, documented procedure (see README).
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and RBAC audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build client
+        working-directory: client
+        run: npm run build
+
+      # Fails the build if any API route is missing its requireRole guard, or if
+      # a guarded route is not covered by the audit's probe list. Runs without a
+      # database or running server: in that mode the script performs the static
+      # route-table audit and coverage cross-check, and skips only the live 403
+      # probe. See server/src/scripts/rbacAudit.js.
+      - name: RBAC audit (unguarded routes fail the build)
+        working-directory: server
+        run: npm run rbac:audit
