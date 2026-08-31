@@ -269,3 +269,10 @@ button.secondary:disabled {
   color: #aaa;
   cursor: not-allowed;
 }
+
+/* R3a: no-seats state (R3-ApproveReject-Error frame) */
+
+.seats-exhausted {
+  color: #b91c1c;
+  font-weight: 600;
+}
