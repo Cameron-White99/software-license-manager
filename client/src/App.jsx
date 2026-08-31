@@ -5,8 +5,9 @@ import PendingQueue from "./pages/PendingQueue.jsx";
 import ApproveReject from "./pages/ApproveReject.jsx";
 import MyRequests from "./pages/MyRequests.jsx";
 import MyLicenses from "./pages/MyLicenses.jsx";
+import ActiveAssignments from "./pages/ActiveAssignments.jsx";
 
-// Next up (per build order): /assignments (R5/R6), /history (R8)
+// Next up (per build order): /history (R8)
 export default function App() {
   return (
     <BrowserRouter>
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/requests/:id" element={<ApproveReject />} />
         <Route path="/my-requests" element={<MyRequests />} />
         <Route path="/my-licenses" element={<MyLicenses />} />
+        <Route path="/assignments" element={<ActiveAssignments />} />
         <Route path="*" element={<Navigate to="/licenses" replace />} />
       </Routes>
     </BrowserRouter>
