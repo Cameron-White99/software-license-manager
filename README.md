@@ -36,9 +36,21 @@ server/
 cd server
 cp .env.example .env   # edit MONGO_URI if needed
 npm install
+npm run seed           # creates the demo Admin/User accounts - see note below
 npm run dev
 ```
 Server runs on `http://localhost:5000`.
+
+#### Seeding demo accounts
+
+`npm run seed` creates one Admin and one User record with fixed IDs. This is
+required before testing R1 (and R2-R4 downstream), because a license request
+must reference a real user document, and there is no sign-up or login flow to
+create one - authentication is out of scope per the Phase 1 assumptions.
+
+The same fixed IDs are referenced client-side in `client/src/api/session.js`
+and sent as the `x-user-id` header, standing in for a real session. The seed
+is idempotent, so re-running it is safe.
 
 ### Frontend
 ```bash
@@ -53,7 +65,7 @@ App runs on `http://localhost:5173` (proxies `/api` to the backend).
 | Requirement | Status |
 |---|---|
 | R2b — Add license to inventory | ✅ Implemented (model, API, UI) |
-| R1 — Submit request | ⬜ Not yet built |
+| R1 — Submit request | ✅ Implemented (model, API, UI) |
 | R2 — View pending requests | ⬜ Not yet built |
 | R3 — Approve & assign | ⬜ Not yet built |
 | R4 — User dashboard | ⬜ Not yet built |
@@ -65,7 +77,8 @@ App runs on `http://localhost:5173` (proxies `/api` to the backend).
 ## Known limitations
 
 - Authentication is out of scope (see Phase 1 assumptions). Role is passed via
-  an `x-user-role` header to simulate a logged-in session.
+  an `x-user-role` header, and user identity via an `x-user-id` header, to
+  simulate a logged-in session. Both refer to the seeded demo accounts.
 - No CI/CD pipeline — deployment to EC2 is manual and documented separately.
 
 ## Deployment
@@ -98,6 +111,7 @@ cd ../server
 npm install
 cp .env.example .env
 # edit .env: set MONGO_URI to your Atlas connection string, PORT=80
+npm run seed           # one-time: create the demo Admin/User accounts
 
 sudo npm run start     # sudo needed to bind port 80; see note below
 ```
