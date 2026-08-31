@@ -105,10 +105,10 @@ export async function getRequest(req, res) {
 //  - sets request.status = Approved and increments the license's seatsUsed
 //  - Admin only (enforced by the route)
 //
-// NOTE: this deliberately does not verify the license has a free seat before
-// assigning. Seat-capacity validation is R3a, tracked as its own story - see
-// NextSteps.md. Approving against a full license currently pushes seatsUsed
-// past totalSeats.
+// R3a: approval is blocked unless the matching license has a free seat.
+// Before this guard, approving against a full license returned 200 and pushed
+// seatsUsed past totalSeats (e.g. 3/2), allocating a seat that did not exist -
+// found during R3 verification and fixed here as a follow-up story.
 export async function approveRequest(req, res) {
   try {
     const request = await Request.findById(req.params.id);
@@ -125,6 +125,14 @@ export async function approveRequest(req, res) {
     if (!license) {
       return res.status(400).json({
         error: `No license in inventory matches "${request.productRequested}".`,
+      });
+    }
+
+    // R3a: refuse before writing anything, so a blocked approval leaves the
+    // request Pending, creates no Assignment, and does not touch seatsUsed.
+    if (license.seatsUsed >= license.totalSeats) {
+      return res.status(400).json({
+        error: `No seats available for "${license.productName}" (${license.seatsUsed}/${license.totalSeats} in use).`,
       });
     }
 
