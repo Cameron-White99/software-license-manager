@@ -20,6 +20,7 @@ export default function Header({ role = "Admin" }) {
           <>
             <Link to="/requests/new">Submit Request</Link>
             <Link to="/my-requests">My Requests</Link>
+            <Link to="/my-licenses">My Licenses</Link>
           </>
         )}
         <span className={`role-pill ${isAdmin ? "admin" : "user"}`}>{role}</span>

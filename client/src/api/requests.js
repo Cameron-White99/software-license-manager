@@ -78,3 +78,18 @@ export async function rejectRequest(id) {
   }
   return data;
 }
+
+// R4: the signed-in User's own requests, for the My Requests view.
+export async function fetchMyRequests() {
+  const res = await fetch(`${BASE}/mine`, {
+    headers: {
+      "x-user-role": "User", // see server/src/middleware/auth.js for the scope note on this
+      "x-user-id": DEMO_USER_ID,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch your requests.");
+  }
+  return data;
+}
