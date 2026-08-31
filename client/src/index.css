@@ -283,3 +283,39 @@ button.secondary:disabled {
   background: #dcefe1;
   color: #16803c;
 }
+
+/* R5: active assignments (R5-ActiveAssignments frame) */
+
+.filter-row .filter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4d4d59;
+  align-self: center;
+}
+
+.filter-select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 13px;
+  color: #1a1a1a;
+}
+
+button.danger {
+  padding: 6px 14px;
+  background: #fff;
+  color: #b91c1c;
+  border: 1px solid #f0b4b4;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button.danger:disabled {
+  color: #b0b0b8;
+  border-color: #ddd;
+  cursor: not-allowed;
+}

@@ -1,4 +1,4 @@
-import { DEMO_USER_ID } from "./session.js";
+import { DEMO_ADMIN_ID, DEMO_USER_ID } from "./session.js";
 
 const BASE = "/api/assignments";
 
@@ -14,6 +14,22 @@ export async function fetchMyLicenses() {
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error || "Failed to fetch your licenses.");
+  }
+  return data;
+}
+
+// R5: Admin views all active assignments, optionally filtered to one license.
+export async function fetchAssignments(licenseId) {
+  const url = licenseId ? `${BASE}?licenseId=${encodeURIComponent(licenseId)}` : BASE;
+  const res = await fetch(url, {
+    headers: {
+      "x-user-role": "Admin", // see server/src/middleware/auth.js for the scope note on this
+      "x-user-id": DEMO_ADMIN_ID,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch assignments.");
   }
   return data;
 }
