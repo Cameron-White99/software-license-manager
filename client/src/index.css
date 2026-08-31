@@ -133,3 +133,93 @@ button.primary:disabled {
   margin-top: 12px;
   text-align: center;
 }
+
+/* R2: request queue (R2-PendingQueue frame) */
+
+.card.wide {
+  width: 560px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+button.filter {
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background: #fff;
+  color: #4d4d59;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button.filter.active {
+  background: #2463eb;
+  border-color: #2463eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.request-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.request-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #ececf0;
+}
+
+.request-row:last-child {
+  border-bottom: none;
+}
+
+.request-product {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.request-meta {
+  font-size: 12px;
+  color: #6b6b76;
+  margin-top: 3px;
+}
+
+/* Same pill shape as .role-pill, keyed by request status. */
+.status-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.status-badge.pending {
+  background: #fdf0d5;
+  color: #92610a;
+}
+
+.status-badge.approved {
+  background: #dcefe1;
+  color: #16803c;
+}
+
+.status-badge.rejected {
+  background: #ffe5e5;
+  color: #b91c1c;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: #6b6b76;
+  text-align: center;
+  padding: 24px 0;
+}
