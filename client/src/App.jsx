@@ -6,6 +6,7 @@ import ApproveReject from "./pages/ApproveReject.jsx";
 import MyRequests from "./pages/MyRequests.jsx";
 import MyLicenses from "./pages/MyLicenses.jsx";
 import ActiveAssignments from "./pages/ActiveAssignments.jsx";
+import RevokeConfirm from "./pages/RevokeConfirm.jsx";
 
 // Next up (per build order): /history (R8)
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/my-requests" element={<MyRequests />} />
         <Route path="/my-licenses" element={<MyLicenses />} />
         <Route path="/assignments" element={<ActiveAssignments />} />
+        <Route path="/assignments/:id/revoke" element={<RevokeConfirm />} />
         <Route path="*" element={<Navigate to="/licenses" replace />} />
       </Routes>
     </BrowserRouter>

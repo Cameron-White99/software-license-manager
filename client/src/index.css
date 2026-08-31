@@ -319,3 +319,37 @@ button.danger:disabled {
   border-color: #ddd;
   cursor: not-allowed;
 }
+
+/* R6: revoke confirmation (R6-RevokeConfirm frame) */
+
+.button-link {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+button.danger.solid {
+  background: #b91c1c;
+  color: #fff;
+  border-color: #b91c1c;
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+button.danger.solid:disabled {
+  background: #d9a2a2;
+  border-color: #d9a2a2;
+  color: #fff;
+}
+
+.confirm-text {
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.confirm-note {
+  font-size: 12px;
+  color: #6b6b76;
+  margin: 16px 0 0 0;
+}

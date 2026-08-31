@@ -33,3 +33,19 @@ export async function fetchAssignments(licenseId) {
   }
   return data;
 }
+
+// R6: Admin revokes an active assignment.
+export async function revokeAssignment(id) {
+  const res = await fetch(`${BASE}/${id}/revoke`, {
+    method: "PATCH",
+    headers: {
+      "x-user-role": "Admin", // see server/src/middleware/auth.js for the scope note on this
+      "x-user-id": DEMO_ADMIN_ID,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to revoke assignment.");
+  }
+  return data;
+}
