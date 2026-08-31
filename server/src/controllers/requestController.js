@@ -79,6 +79,27 @@ export async function listRequests(req, res) {
   }
 }
 
+// R4: the signed-in User's own requests, for the My Requests view.
+// Acceptance criteria:
+//  - each row shows the request's status and the date submitted
+//  - scoped to the requesting user only - never anyone else's requests
+// Scoping comes from the x-user-id header, the same simulation R1 uses to
+// record ownership in the first place.
+export async function listMyRequests(req, res) {
+  try {
+    const userId = getUserId(req);
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ error: "A valid user id is required." });
+    }
+
+    const requests = await Request.find({ userId }).sort({ createdAt: -1 });
+    return res.json(requests);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to fetch your requests." });
+  }
+}
+
 // R3: detail for a single request, for the approve/reject screen.
 // Returns the matching license alongside it so the screen can show the
 // seats-available line without a second round trip. license is null when
