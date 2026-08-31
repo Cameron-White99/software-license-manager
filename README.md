@@ -132,6 +132,17 @@ pm2 startup            # follow the printed instructions to enable on reboot
   (no real values) is tracked.
 - Only ports 80 and 22 open in the security group; 22 restricted to a specific IP.
 - Database credentials live in Atlas, not on the instance filesystem beyond `.env`.
+- **Role-based access control** is enforced on every API route by
+  `requireRole()` (`server/src/middleware/auth.js`). Run `npm run rbac:audit`
+  in `/server` to re-verify: it walks Express's registered route table,
+  reports each route's required role, and hits every protected endpoint with
+  the wrong role and with no role at all, expecting 403. It exits non-zero if
+  any route is unguarded, unprobed, or lets the wrong role through.
+  `GET /api/health` is intentionally public and returns only `{ status: "ok" }`.
+- Authentication itself is out of scope (Phase 1 assumptions), so role and
+  user identity arrive as headers. In a production system these would come
+  from a verified session or token — the headers are trivially forgeable and
+  are a simulation of a logged-in session, not a security boundary.
 
 ### Redeploying after a change
 ```bash

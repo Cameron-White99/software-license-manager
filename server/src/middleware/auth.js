@@ -3,13 +3,21 @@
 // (e.g. from a seeded session/login not built as part of this assessment).
 // This middleware only enforces role-based access control (R11 / cross-cutting).
 export function requireRole(role) {
-  return (req, res, next) => {
+  const guard = (req, res, next) => {
     const userRole = req.header("x-user-role");
     if (userRole !== role) {
       return res.status(403).json({ error: `Forbidden: ${role} role required.` });
     }
     next();
   };
+
+  // Tag the guard with the role it enforces so the RBAC audit
+  // (scripts/rbacAudit.js) can report each route's required role from the
+  // actual registered middleware rather than a hand-maintained list.
+  // Metadata only - it is not read during request handling.
+  guard.requiredRole = role;
+
+  return guard;
 }
 
 // R1: the identity of the submitting User. Same simulation as the role header —
