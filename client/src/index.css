@@ -223,3 +223,49 @@ button.filter.active {
   text-align: center;
   padding: 24px 0;
 }
+
+/* R3: approve/reject detail screen (R3-ApproveReject-Default frame) */
+
+.request-main {
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+  padding: 10px 0;
+  border-bottom: 1px solid #ececf0;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #4d4d59;
+}
+
+.action-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button.secondary {
+  width: 100%;
+  padding: 10px 20px;
+  background: #fff;
+  color: #4d4d59;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.secondary:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}

@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Request from "../models/Request.js";
 import User from "../models/User.js";
+import License from "../models/License.js";
+import Assignment from "../models/Assignment.js";
 import { getUserId } from "../middleware/auth.js";
 
 // R1: User submits a license request specifying the product they need.
@@ -74,5 +76,98 @@ export async function listRequests(req, res) {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to fetch requests." });
+  }
+}
+
+// R3: detail for a single request, for the approve/reject screen.
+// Returns the matching license alongside it so the screen can show the
+// seats-available line without a second round trip. license is null when
+// nothing in inventory matches the requested product.
+export async function getRequest(req, res) {
+  try {
+    const request = await Request.findById(req.params.id).populate("userId", "name email");
+    if (!request) {
+      return res.status(404).json({ error: "Request not found." });
+    }
+
+    const license = await License.findOne({ productName: request.productRequested });
+
+    return res.json({ request, license });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to fetch request." });
+  }
+}
+
+// R3: Admin approves a pending request and assigns a license seat.
+// Acceptance criteria:
+//  - creates an Assignment (Active) linking the request's user to a matching License
+//  - sets request.status = Approved and increments the license's seatsUsed
+//  - Admin only (enforced by the route)
+//
+// NOTE: this deliberately does not verify the license has a free seat before
+// assigning. Seat-capacity validation is R3a, tracked as its own story - see
+// NextSteps.md. Approving against a full license currently pushes seatsUsed
+// past totalSeats.
+export async function approveRequest(req, res) {
+  try {
+    const request = await Request.findById(req.params.id);
+    if (!request) {
+      return res.status(404).json({ error: "Request not found." });
+    }
+    if (request.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ error: `Request has already been ${request.status.toLowerCase()}.` });
+    }
+
+    const license = await License.findOne({ productName: request.productRequested });
+    if (!license) {
+      return res.status(400).json({
+        error: `No license in inventory matches "${request.productRequested}".`,
+      });
+    }
+
+    const assignment = await Assignment.create({
+      licenseId: license._id,
+      userId: request.userId,
+      status: "Active",
+    });
+
+    // The pre-save hook on License re-derives status (Active/Full) from seatsUsed.
+    license.seatsUsed += 1;
+    await license.save();
+
+    request.status = "Approved";
+    await request.save();
+
+    return res.json({ request, assignment, license });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to approve request." });
+  }
+}
+
+// R3: Admin rejects a pending request. No Assignment is created and no seat
+// is consumed.
+export async function rejectRequest(req, res) {
+  try {
+    const request = await Request.findById(req.params.id);
+    if (!request) {
+      return res.status(404).json({ error: "Request not found." });
+    }
+    if (request.status !== "Pending") {
+      return res
+        .status(400)
+        .json({ error: `Request has already been ${request.status.toLowerCase()}.` });
+    }
+
+    request.status = "Rejected";
+    await request.save();
+
+    return res.json(request);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to reject request." });
   }
 }
