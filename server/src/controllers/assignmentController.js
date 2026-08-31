@@ -29,6 +29,31 @@ export async function listMyAssignments(req, res) {
   }
 }
 
+// R8: the signed-in User's revoked licenses, for the read-only history view.
+// Acceptance criteria:
+//  - a revoked license appears here, not under My Licenses (which filters to
+//    Active - see listMyAssignments)
+//  - scoped to the requesting user only
+// Sorted by updatedAt, which is when the revoke happened - createdAt is the
+// original assignment date, so it would order by the wrong event.
+export async function listMyHistory(req, res) {
+  try {
+    const userId = getUserId(req);
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ error: "A valid user id is required." });
+    }
+
+    const history = await Assignment.find({ userId, status: "Revoked" })
+      .populate("licenseId", "productName vendor")
+      .sort({ updatedAt: -1 });
+
+    return res.json(history);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to fetch your license history." });
+  }
+}
+
 // R5: Admin views every active license assignment across the organisation.
 // Acceptance criteria:
 //  - shows assigned user (name), license/product, and assignment date

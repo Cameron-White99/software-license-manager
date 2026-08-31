@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   listMyAssignments,
   listAssignments,
+  listMyHistory,
   revokeAssignment,
 } from "../controllers/assignmentController.js";
 import { requireRole } from "../middleware/auth.js";
@@ -13,13 +14,15 @@ const router = Router();
 // order, so "mine" would otherwise be captured as an id (see R4).
 router.get("/mine", requireRole("User"), listMyAssignments);
 
+// R8: User views their revoked licenses (read-only history). A distinct
+// literal path from /mine, kept with the other literals above /:id routes.
+router.get("/mine/history", requireRole("User"), listMyHistory);
+
 // R5: Admin views all active assignments, optionally filtered by ?licenseId=
 router.get("/", requireRole("Admin"), listAssignments);
 
 // R6: Admin revokes an active assignment. Registered after the literal
 // /mine path above, per the R4 ordering note.
 router.patch("/:id/revoke", requireRole("Admin"), revokeAssignment);
-
-// Next up: GET /mine/history (R8)
 
 export default router;

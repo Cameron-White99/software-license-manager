@@ -353,3 +353,10 @@ button.danger.solid:disabled {
   color: #6b6b76;
   margin: 16px 0 0 0;
 }
+
+/* R8: revoked license history (R8-LicenseHistory frame) */
+
+.status-badge.revoked {
+  background: #ffe5e5;
+  color: #b91c1c;
+}
