@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Request from "../models/Request.js";
+import User from "../models/User.js";
 import { getUserId } from "../middleware/auth.js";
 
 // R1: User submits a license request specifying the product they need.
@@ -17,6 +18,14 @@ export async function createRequest(req, res) {
     }
     if (!productRequested || !productRequested.trim()) {
       return res.status(400).json({ error: "Product name is required." });
+    }
+
+    // Mongoose does not enforce referential integrity on a ref, so a well-formed
+    // but nonexistent id would persist a request whose requester populates to null.
+    // R2/R3/R4 all read this field, so reject at write time rather than have every
+    // downstream view defend against a dangling ref. (PR #1 self-review.)
+    if (!(await User.exists({ _id: userId }))) {
+      return res.status(400).json({ error: "A valid user id is required." });
     }
 
     const request = await Request.create({
