@@ -2,19 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import { fetchRequest, approveRequest, rejectRequest } from "../api/requests.js";
+import { formatDate } from "../utils/date.js";
 
 // R3: Admin approves a request (assigning a license seat) or rejects it.
 // Mirrors the R3-ApproveReject-Default frame, plus the R3-ApproveReject-Error
 // state added in R3a: when the matching license has no free seat, a red banner
 // explains why and Approve is disabled. Reject stays available - rejecting a
 // request nobody can fill is still a valid action.
-function formatDate(value) {
-  return new Date(value).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default function ApproveReject() {
   const { id } = useParams();
