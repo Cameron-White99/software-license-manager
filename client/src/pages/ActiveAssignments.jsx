@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import { fetchAssignments } from "../api/assignments.js";
 import { fetchLicenses } from "../api/licenses.js";
@@ -7,7 +8,7 @@ import { formatDate } from "../utils/date.js";
 // R5: Admin views all active license assignments across the organisation.
 // Mirrors the R5-ActiveAssignments Figma frame: filter-by-license control, one
 // row per assignment (product, user, assigned date) and a Revoke button.
-// The Revoke button is rendered but inert here - R6 wires it up.
+// Each row's Revoke opens the R6 confirmation step.
 export default function ActiveAssignments() {
   const [licenseId, setLicenseId] = useState("");
   const [licenses, setLicenses] = useState([]);
@@ -100,10 +101,10 @@ export default function ActiveAssignments() {
                       {formatDate(assignment.createdAt)}
                     </div>
                   </div>
-                  {/* R6 wires this up; inert until then rather than pretending to work. */}
-                  <button type="button" className="danger" disabled>
+                  {/* R6: confirmation is required before the revoke is applied. */}
+                  <Link to={`/assignments/${assignment._id}/revoke`} className="danger button-link">
                     Revoke
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
