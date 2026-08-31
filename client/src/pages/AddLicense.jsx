@@ -44,7 +44,7 @@ export default function AddLicense() {
 
   return (
     <>
-      <Header />
+      <Header role="Admin" />
       <div className="content">
         <div className="card">
           <h2>Add License to Inventory</h2>
