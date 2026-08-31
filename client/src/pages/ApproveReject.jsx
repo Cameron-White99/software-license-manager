@@ -4,8 +4,10 @@ import Header from "../components/Header.jsx";
 import { fetchRequest, approveRequest, rejectRequest } from "../api/requests.js";
 
 // R3: Admin approves a request (assigning a license seat) or rejects it.
-// Mirrors the R3-ApproveReject-Default Figma frame. The no-seats error state
-// (R3-ApproveReject-Error) belongs to R3a and is not built here.
+// Mirrors the R3-ApproveReject-Default frame, plus the R3-ApproveReject-Error
+// state added in R3a: when the matching license has no free seat, a red banner
+// explains why and Approve is disabled. Reject stays available - rejecting a
+// request nobody can fill is still a valid action.
 function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, {
     day: "numeric",
@@ -64,6 +66,11 @@ export default function ApproveReject() {
   const seatsAvailable = license ? license.totalSeats - license.seatsUsed : null;
   const actionable = request?.status === "Pending";
 
+  // R3a: mirrors the server guard in approveRequest - the server remains the
+  // source of truth, this just explains the block before the Admin clicks.
+  const noSeats = !!license && license.seatsUsed >= license.totalSeats;
+  const canApprove = actionable && !!license && !noSeats && !busy;
+
   return (
     <>
       <Header role="Admin" />
@@ -100,19 +107,25 @@ export default function ApproveReject() {
               </div>
               <div className="detail-row">
                 <span className="detail-label">Seats available</span>
-                <span>
+                <span className={noSeats ? "seats-exhausted" : ""}>
                   {license
                     ? `${seatsAvailable} of ${license.totalSeats}`
                     : "No matching license in inventory"}
                 </span>
               </div>
 
+              {actionable && noSeats && (
+                <div className="banner">
+                  No seats available &mdash; approval blocked.
+                </div>
+              )}
+
               {actionable ? (
                 <div className="action-row">
                   <button
                     type="button"
                     className="primary"
-                    disabled={busy}
+                    disabled={!canApprove}
                     onClick={() => handleAction(approveRequest)}
                   >
                     Approve &amp; Assign
