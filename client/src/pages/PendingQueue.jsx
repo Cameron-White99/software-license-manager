@@ -2,19 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import { fetchRequests } from "../api/requests.js";
+import { formatDate } from "../utils/date.js";
 
 // R2: Admin views the license request queue.
 // Mirrors the R2-PendingQueue Figma frame: title, filter row, and one row per
 // request showing product, requester name + date submitted, and a status badge.
 const FILTERS = ["All", "Pending", "Approved", "Rejected"];
 
-function formatDate(value) {
-  return new Date(value).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default function PendingQueue() {
   const [filter, setFilter] = useState("Pending");

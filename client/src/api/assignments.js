@@ -1,0 +1,19 @@
+import { DEMO_USER_ID } from "./session.js";
+
+const BASE = "/api/assignments";
+
+// R4: the signed-in User's currently held licenses. Active assignments only -
+// revoked ones belong to R8's history view.
+export async function fetchMyLicenses() {
+  const res = await fetch(`${BASE}/mine`, {
+    headers: {
+      "x-user-role": "User", // see server/src/middleware/auth.js for the scope note on this
+      "x-user-id": DEMO_USER_ID,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch your licenses.");
+  }
+  return data;
+}

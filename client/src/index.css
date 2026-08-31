@@ -276,3 +276,10 @@ button.secondary:disabled {
   color: #b91c1c;
   font-weight: 600;
 }
+
+/* R4: assignment status badge (R4-MyLicenses frame) */
+
+.status-badge.active {
+  background: #dcefe1;
+  color: #16803c;
+}

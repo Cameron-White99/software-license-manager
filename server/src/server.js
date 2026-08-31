@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
 import licenseRoutes from "./routes/licenses.js";
 import requestRoutes from "./routes/requests.js";
+import assignmentRoutes from "./routes/assignments.js";
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.use(express.json());
 
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/requests", requestRoutes);
-// Next up (per build order): /api/assignments (R5/R6/R7)
+app.use("/api/assignments", assignmentRoutes);
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
