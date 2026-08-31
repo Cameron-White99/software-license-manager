@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import { fetchRequests } from "../api/requests.js";
 
@@ -80,14 +81,15 @@ export default function PendingQueue() {
             <ul className="request-list">
               {requests.map((request) => (
                 <li key={request._id} className="request-row">
-                  <div className="request-main">
+                  {/* R3: rows open the approve/reject screen */}
+                  <Link to={`/requests/${request._id}`} className="request-main">
                     <div className="request-product">{request.productRequested}</div>
                     <div className="request-meta">
                       {/* R1 guarantees userId resolves, but a request created before
                           that check could still be orphaned - fall back rather than crash. */}
                       {request.userId?.name ?? "Unknown user"} · {formatDate(request.createdAt)}
                     </div>
-                  </div>
+                  </Link>
                   <span className={`status-badge ${request.status.toLowerCase()}`}>
                     {request.status}
                   </span>
