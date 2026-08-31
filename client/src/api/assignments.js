@@ -49,3 +49,18 @@ export async function revokeAssignment(id) {
   }
   return data;
 }
+
+// R8: the signed-in User's revoked licenses, for the read-only history view.
+export async function fetchMyHistory() {
+  const res = await fetch(`${BASE}/mine/history`, {
+    headers: {
+      "x-user-role": "User", // see server/src/middleware/auth.js for the scope note on this
+      "x-user-id": DEMO_USER_ID,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch your license history.");
+  }
+  return data;
+}
