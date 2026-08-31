@@ -105,6 +105,7 @@ const PROTECTED = [
   { method: "GET", path: "/api/requests/mine", role: "User" },
   { method: "GET", path: "/api/assignments/mine", role: "User" },
   { method: "GET", path: "/api/assignments", role: "Admin" },
+  { method: "PATCH", path: "/api/assignments/000000000000000000000009/revoke", role: "Admin" },
 ];
 
 async function probe(base) {
