@@ -186,18 +186,36 @@ async function main() {
   const unguarded = printAudit(rows);
   const coverageProblems = crossCheckCoverage(rows);
 
+  // /api/health is intentionally public; any other unguarded route is a gap.
+  const gaps = unguarded.filter((r) => r.path !== "/api/health");
+
   const base = process.env.RBAC_BASE_URL || "http://127.0.0.1:5000";
   let results = [];
+  let probeSkipped = false;
   try {
     await fetch(base + "/api/health");
   } catch {
-    console.log(`\nNo server reachable at ${base} - skipping probe. Start it with 'npm run dev'.`);
-    process.exit(unguarded.some((r) => r.path !== "/api/health") ? 1 : 0);
+    probeSkipped = true;
   }
-  results = await probe(base);
 
-  // /api/health is intentionally public; any other unguarded route is a gap.
-  const gaps = unguarded.filter((r) => r.path !== "/api/health");
+  if (probeSkipped) {
+    // Static mode: no server (this is how CI runs it, with no Mongo). The audit
+    // and coverage cross-check still run and still fail the build - only the
+    // live 403 probe is skipped.
+    console.log(`\nNo server reachable at ${base} - running audit only.`);
+    console.log("Start the server ('npm run dev') to include the live 403 probe.");
+    console.log("\n=== RESULT (audit only) ===");
+    const staticProblems = gaps.length + coverageProblems.length;
+    if (staticProblems === 0) {
+      console.log("No unguarded routes, and every guarded route is covered by the probe list.");
+    } else {
+      if (gaps.length) console.log(`GAPS: ${gaps.map((r) => `${r.method} ${r.path}`).join(", ")}`);
+      if (coverageProblems.length) console.log(`COVERAGE: ${coverageProblems.join("; ")}`);
+    }
+    process.exit(staticProblems === 0 ? 0 : 1);
+  }
+
+  results = await probe(base);
   const failures = results.filter((r) => !r.ok);
 
   console.log("\n=== RESULT ===");
