@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import Assignment from "../models/Assignment.js";
 import { getUserId } from "../middleware/auth.js";
-// Registers the License model so populate("licenseId") resolves rather than
-// throwing MissingSchemaError - see the R1 self-review on PR #1.
-import "../models/License.js";
+// Also registers the License model so populate("licenseId") resolves rather
+// than throwing MissingSchemaError - see the R1 self-review on PR #1.
+import License from "../models/License.js";
 import "../models/User.js";
 
 // R4: the signed-in User's currently held licenses, for the My Licenses view.
@@ -67,10 +67,10 @@ export async function listAssignments(req, res) {
 // The revoked record is retained, not deleted, so R8's history view has
 // something to show.
 //
-// NOTE: this sets status only. Reclaiming the seat (decrementing seatsUsed
-// and reverting the license from Full to Active) is R7, which extends this
-// same function - see NextSteps.md. Until then a revoked seat stays counted
-// against the license.
+// R7: revoking also reclaims the seat - seatsUsed decrements and the License
+// pre-save hook flips the licence back from Full to Active, making it
+// reassignable. Before R7 the seat stayed counted against the license, so a
+// full license could never be freed by revoking.
 export async function revokeAssignment(req, res) {
   try {
     const assignment = await Assignment.findById(req.params.id);
@@ -86,7 +86,16 @@ export async function revokeAssignment(req, res) {
     assignment.status = "Revoked";
     await assignment.save();
 
-    return res.json(assignment);
+    // R7: reclaim the seat. Guarded with max(0, ...) so a license whose count
+    // is already at zero - only reachable if data drifted - cannot be pushed
+    // negative by a revoke. The pre-save hook re-derives Full/Active.
+    const license = await License.findById(assignment.licenseId);
+    if (license) {
+      license.seatsUsed = Math.max(0, license.seatsUsed - 1);
+      await license.save();
+    }
+
+    return res.json({ assignment, license });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to revoke assignment." });
