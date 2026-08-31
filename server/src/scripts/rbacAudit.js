@@ -104,6 +104,7 @@ const PROTECTED = [
   { method: "POST", path: "/api/requests", role: "User", body: { productRequested: "X" } },
   { method: "GET", path: "/api/requests/mine", role: "User" },
   { method: "GET", path: "/api/assignments/mine", role: "User" },
+  { method: "GET", path: "/api/assignments", role: "Admin" },
 ];
 
 async function probe(base) {
