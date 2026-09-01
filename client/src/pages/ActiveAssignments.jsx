@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header.jsx";
+import LicenseSelect from "../components/LicenseSelect.jsx";
 import { fetchAssignments } from "../api/assignments.js";
 import { fetchLicenses } from "../api/licenses.js";
 import { formatDate } from "../utils/date.js";
@@ -59,24 +60,18 @@ export default function ActiveAssignments() {
         <div className="card wide">
           <h2>Active Assignments</h2>
 
-          <div className="filter-row">
-            <label className="filter-label" htmlFor="license-filter">
-              License
-            </label>
-            <select
-              id="license-filter"
-              className="filter-select"
-              value={licenseId}
-              onChange={(e) => setLicenseId(e.target.value)}
-            >
-              <option value="">All licenses</option>
-              {licenses.map((license) => (
-                <option key={license._id} value={license._id}>
-                  {license.productName}
-                </option>
-              ))}
-            </select>
-          </div>
+          <LicenseSelect
+            variant="filter"
+            id="license-filter"
+            label="License"
+            placeholder="All licenses"
+            value={licenseId}
+            onChange={setLicenseId}
+            options={licenses.map((license) => ({
+              value: license._id,
+              label: license.productName,
+            }))}
+          />
 
           {loadError && <div className="banner">{loadError}</div>}
 
