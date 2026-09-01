@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/scripts/seedUsers.js",
+    "reset:demo": "node src/scripts/resetDemo.js",
     "rbac:audit": "node src/scripts/rbacAudit.js"
   },
   "dependencies": {
