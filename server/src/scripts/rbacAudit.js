@@ -97,6 +97,7 @@ function printAudit(rows) {
 const PROTECTED = [
   { method: "POST", path: "/api/licenses", role: "Admin", body: { productName: "X", vendor: "Y", totalSeats: 1 } },
   { method: "GET", path: "/api/licenses", role: "Admin" },
+  { method: "GET", path: "/api/licenses/available", role: "User" },
   { method: "GET", path: "/api/requests", role: "Admin" },
   { method: "GET", path: "/api/requests/000000000000000000000009", role: "Admin" },
   { method: "PATCH", path: "/api/requests/000000000000000000000009/approve", role: "Admin" },

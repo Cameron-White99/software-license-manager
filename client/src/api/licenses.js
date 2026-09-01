@@ -1,3 +1,5 @@
+import { DEMO_USER_ID } from "./session.js";
+
 const BASE = "/api/licenses";
 
 export async function createLicense({ productName, vendor, totalSeats }) {
@@ -27,6 +29,22 @@ export async function fetchLicenses() {
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error || "Failed to fetch licenses.");
+  }
+  return data;
+}
+
+// R1 (dropdown fix): the product list a User can request from. Returns only
+// productName + seatsAvailable - see listAvailableLicenses on the server.
+export async function fetchAvailableLicenses() {
+  const res = await fetch(`${BASE}/available`, {
+    headers: {
+      "x-user-role": "User", // see server/src/middleware/auth.js for the scope note on this
+      "x-user-id": DEMO_USER_ID,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to fetch available licenses.");
   }
   return data;
 }
