@@ -157,4 +157,4 @@ procedure, run by hand each time.
 ### Live deployment
 [EC2 public URL - Admin](http://3.27.167.247:3000/licenses)
 
-[EC2 public URL - User](http://3.27.167.247:3000/licenses/new)
+[EC2 public URL - User](http://3.27.167.247:3000/requests/new)
