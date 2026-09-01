@@ -155,4 +155,5 @@ CI/CD is out of scope for this assessment — the above is a manual, documented
 procedure, run by hand each time.
 
 ### Live deployment
-[EC2 public URL](http://54.206.58.84:3000/licenses)
+[EC2 public URL - Admin](http://3.27.167.247:3000/licenses)
+[EC2 public URL - User](http://3.27.167.247:3000/licenses/new)
