@@ -360,3 +360,19 @@ button.danger.solid:disabled {
   background: #ffe5e5;
   color: #b91c1c;
 }
+
+/* R1 (dropdown fix): the shared LicenseSelect in its stacked form-field layout */
+
+.field .filter-select.field-select {
+  width: 100%;
+}
+
+.filter-select.error {
+  border-color: #dc2626;
+}
+
+.filter-select:disabled {
+  background: #f4f4f6;
+  color: #9a9aa4;
+  cursor: not-allowed;
+}
