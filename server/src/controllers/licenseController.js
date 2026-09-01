@@ -48,3 +48,32 @@ export async function listLicenses(req, res) {
     return res.status(500).json({ error: "Failed to fetch licenses." });
   }
 }
+
+// R1 (dropdown fix): the product list a User picks from on the Submit Request
+// screen. Deliberately NOT the Admin listLicenses response - a User has no
+// business seeing vendor, totalSeats, seatsUsed, timestamps or ids, so this
+// returns only what the dropdown renders: the product name and whether a seat
+// is currently free.
+//
+// productName is the contract with R3: approval matches
+// request.productRequested against license.productName, so the dropdown
+// submits the exact stored string and a typo can no longer break the match.
+export async function listAvailableLicenses(req, res) {
+  try {
+    const licenses = await License.find()
+      .select("productName totalSeats seatsUsed")
+      .sort({ productName: 1 });
+
+    // Shape the payload explicitly rather than leaking the documents: the
+    // seat numbers are used to derive availability, not exposed themselves.
+    const available = licenses.map((license) => ({
+      productName: license.productName,
+      seatsAvailable: Math.max(0, license.totalSeats - license.seatsUsed),
+    }));
+
+    return res.json(available);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to fetch available licenses." });
+  }
+}
