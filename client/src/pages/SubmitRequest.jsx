@@ -85,7 +85,7 @@ export default function SubmitRequest() {
               value={productRequested}
               onChange={(value) => setProductRequested(value)}
               disabled={loadingLicenses || noLicenses}
-              invalid={!!errors.productRequested}
+              error={errors.productRequested}
               // The value is the productName, not an id: R3 approves by matching
               // request.productRequested against license.productName, so keeping
               // the name means that contract is unchanged.
@@ -96,9 +96,6 @@ export default function SubmitRequest() {
                 } available`,
               }))}
             />
-            {errors.productRequested && (
-              <div className="error-text">{errors.productRequested}</div>
-            )}
 
             {noLicenses && (
               <div className="empty-text">

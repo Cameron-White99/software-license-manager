@@ -20,7 +20,7 @@ export default function LicenseSelect({
   options,
   placeholder,
   disabled = false,
-  invalid = false,
+  error = "",
   variant = "field",
 }) {
   const isFilter = variant === "filter";
@@ -32,7 +32,7 @@ export default function LicenseSelect({
       </label>
       <select
         id={id}
-        className={`filter-select${isFilter ? "" : " field-select"}${invalid ? " error" : ""}`}
+        className={`filter-select${isFilter ? "" : " field-select"}${error ? " error" : ""}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
@@ -44,6 +44,7 @@ export default function LicenseSelect({
           </option>
         ))}
       </select>
+      {error && <div className="error-text">{error}</div>}
     </div>
   );
 }
