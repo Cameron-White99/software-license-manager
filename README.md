@@ -155,4 +155,4 @@ CI/CD is out of scope for this assessment — the above is a manual, documented
 procedure, run by hand each time.
 
 ### Live deployment
-_EC2 public URL and instance ID to be added here once deployed._
+[EC2 public URL](http://54.206.58.84:3000/licenses)
