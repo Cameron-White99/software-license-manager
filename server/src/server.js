@@ -3,11 +3,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { connectDB } from "./config/db.js";
 import licenseRoutes from "./routes/licenses.js";
 import requestRoutes from "./routes/requests.js";
 import assignmentRoutes from "./routes/assignments.js";
+import notificationRoutes from './notifications/notification.routes.js'
 
+import  Database   from './database/Database.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,6 +22,7 @@ app.use("/api/licenses", licenseRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/assignments", assignmentRoutes);
 
+app.use("/api/notifications", notificationRoutes);
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // Serve the built React app (run `npm run build` in /client first).
@@ -36,6 +38,15 @@ app.get(/^(?!\/api).*/, (req, res) => {
 
 const PORT = process.env.PORT || 80;
 
-connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-});
+Database.getInstance()
+  .connect()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`API running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to start server.');
+    console.error(err.message);
+    process.exit(1);
+  });
