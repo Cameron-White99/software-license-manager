@@ -3,10 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import licenseRoutes from "./routes/licenses.js";
 import requestRoutes from "./routes/requests.js";
 import assignmentRoutes from "./routes/assignments.js";
-import notificationRoutes from './notifications/notification.routes.js'
+import licenseRoute from './licenses/license.routes.js';
+import notificationRoute from './notifications/notification.routes.js';
 
 import  Database   from './database/Database.js';
 dotenv.config();
@@ -18,11 +18,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/licenses", licenseRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/assignments", assignmentRoutes);
 
-app.use("/api/notifications", notificationRoutes);
+app.use('/api/licenses', licenseRoute);
+app.use("/api/notifications", notificationRoute);
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // Serve the built React app (run `npm run build` in /client first).
