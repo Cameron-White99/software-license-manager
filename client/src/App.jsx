@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import Layout from './components/Layout';
 import SignIn from './pages/SignIn';
+import CreateAccount from './pages/CreateAccount';
 
 function GuestOnly({ children }) {
   const { user, loading } = useAuth();
@@ -17,6 +18,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/login" element={user ? <p className="text-center text-secondary">Signed in as {user.full_name}.</p> : <GuestOnly><SignIn /></GuestOnly>} />
+	<Route path="/register" element={<GuestOnly><CreateAccount /></GuestOnly>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Route>
     </Routes>
