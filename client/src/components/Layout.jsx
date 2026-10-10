@@ -37,7 +37,10 @@ export default function Layout() {
                 Logout
               </Button>
             ) : (
-              <Nav.Link as={Link} to="/login">Sign In</Nav.Link>
+              <>
+                <Nav.Link as={Link} to="/login">Sign In</Nav.Link>
+                <Nav.Link as={Link} to="/register">Create Account</Nav.Link>
+              </>
             )}
           </Nav>
         </Container>
