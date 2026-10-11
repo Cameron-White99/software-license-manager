@@ -1,28 +1,27 @@
-import { Link } from "react-router-dom";
 
-// Matches the Header / Admin and Header / User components built in Figma.
-// Role is passed in by each page for now — will read from real auth/session once
-// login exists (out of scope, see Phase 1 assumptions).
-const ROLES = ["Admin", "User"];
+import { Link } from 'react-router-dom';
+
 
 export default function Header({ role }) {
-  // `role` is required and deliberately has no default. It previously defaulted
-  // to "Admin", which meant a page that forgot the prop silently rendered Admin
-  // navigation — the more dangerous direction to fail in. Raised during the RBAC
-  // audit (PR #6); failing loudly here makes the omission impossible to miss.
-  // Navigation is presentation only: the API enforces roles regardless.
+
+
+  const ROLES = ['Admin', 'User'];
+
   if (!ROLES.includes(role)) {
     throw new Error(
-      `Header requires role to be one of ${ROLES.join(" | ")}; received ${JSON.stringify(role)}.`
+      `Header requires role to be Admin or User; received ${JSON.stringify(role)}.`
     );
   }
 
-  const isAdmin = role === "Admin";
+  const isAdmin = role === 'Admin';
 
   return (
-    <div className="header">
-      <div className="logo">License Manager</div>
-      <nav>
+    <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 py-3">
+      <div className="fw-bold text-primary">
+        License Manager
+      </div>
+
+      <nav className="d-flex flex-wrap align-items-center gap-3">
         {isAdmin ? (
           <>
             <Link to="/licenses">Manage Licenses</Link>
@@ -35,9 +34,16 @@ export default function Header({ role }) {
             <Link to="/my-requests">My Requests</Link>
             <Link to="/my-licenses">My Licenses</Link>
             <Link to="/my-history">History</Link>
+
+            {/* Feedback Module - Abhay */}
+            <Link to="/feedback">Submit Feedback</Link>
+            <Link to="/feedback/history">Past Feedback</Link>
           </>
         )}
-        <span className={`role-pill ${isAdmin ? "admin" : "user"}`}>{role}</span>
+
+        <span className="badge bg-secondary">
+          {role}
+        </span>
       </nav>
     </div>
   );

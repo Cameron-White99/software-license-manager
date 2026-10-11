@@ -1,4 +1,6 @@
+import { errorHandler } from './middleware/ErrorMiddleware.js';
 import express from "express";
+
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
@@ -8,6 +10,10 @@ import assignmentRoutes from "./routes/assignments.js";
 import licenseRoute from './licenses/license.routes.js';
 import notificationRoute from './notifications/notification.routes.js';
 import softwareRoute from './software/software.routes.js';
+// Feedback routes = Abhay
+import feedbackRoutes from './feedback/feedback.routes.js';
+import authRoutes from './auth/auth.routes.js';
+import versionRoutes from './versions/version.routes.js';
 
 import  Database   from './database/Database.js';
 dotenv.config();
@@ -26,6 +32,10 @@ app.use('/api/software', softwareRoute);
 app.use('/api/licenses', licenseRoute);
 app.use("/api/notifications", notificationRoute);
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+// Register feedback API
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/versions', versionRoutes);
+app.use('/api/auth', authRoutes);
 
 // Serve the built React app (run `npm run build` in /client first).
 // In local dev, run the Vite dev server separately instead — this static
@@ -37,7 +47,8 @@ app.use(express.static(CLIENT_DIST));
 app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(CLIENT_DIST, "index.html"));
 });
-
+// Centralized API error handling
+app.use(errorHandler);
 const PORT = process.env.PORT || 80;
 
 Database.getInstance()

@@ -1,4 +1,4 @@
-import UserRepository from '../users/UserRepository';
+import * as UserRepository from '../users/UserRepository.js';
 
 function findByEmail(email) {
   return UserRepository.findByEmail(email);

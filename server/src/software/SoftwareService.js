@@ -25,4 +25,9 @@ async function update(id, body) {
 }
 
 
-export { create, update };
+
+async function list() {
+  return SoftwareRepository.findActive();
+}
+
+export { list, create, update };

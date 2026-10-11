@@ -5,6 +5,17 @@ import { isAdmin } from '../middleware/RoleMiddleware.js';
 
 const router = express.Router();
 
+// List active software for authenticated users
+router.get('/', protect, async (req, res, next) => {
+  try {
+    const software = await SoftwareService.list();
+    return res.json(software);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 router.post('/', protect, isAdmin, async (req, res) => {
   return res.json(await SoftwareService.create(req.body));
 });

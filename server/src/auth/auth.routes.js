@@ -1,8 +1,8 @@
 import express from 'express';
-import AuthService from './AuthService';
-import { asyncHandler } from '../middleware/ErrorMiddleware';
-import { protect } from '../middleware/AuthMiddleware';
-import { created, ok } from '../utils/ApiResponse';
+import AuthService from './AuthService.js';
+import { asyncHandler } from '../middleware/ErrorMiddleware.js';
+import { protect } from '../middleware/AuthMiddleware.js';
+import { created, ok } from '../utils/ApiResponse.js';
 
 const router = express.Router();
 
