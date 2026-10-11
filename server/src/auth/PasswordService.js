@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { checkPassword } from '../utils/Validation';
 
 const TEMP_PASSWORD = 'Password123';
