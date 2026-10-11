@@ -19,4 +19,6 @@ async function protect(req, res, next) {
   }
 }
 
-export { protect };
+export {
+  protect
+};

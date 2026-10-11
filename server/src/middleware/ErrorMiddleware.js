@@ -33,4 +33,8 @@ function asyncHandler(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
-export { createError, errorHandler, asyncHandler };
+export {
+  createError,
+  errorHandler,
+  asyncHandler
+};
