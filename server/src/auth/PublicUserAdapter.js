@@ -6,4 +6,4 @@ class PublicUserAdapter {
   }
 }
 
-module.exports = new PublicUserAdapter();
+export default new PublicUserAdapter();

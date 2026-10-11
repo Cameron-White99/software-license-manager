@@ -1,4 +1,4 @@
-const Software = require('./Software');
+import Software from './Software.js';
 
 function findActive() {
   return Software.find({ deleted_at: null }).sort({ created_at: 1, software_name: 1 });
@@ -24,7 +24,7 @@ function save(software) {
   return software.save();
 }
 
-module.exports = {
+export {
   findActive,
   findActiveById,
   findActiveByName,
