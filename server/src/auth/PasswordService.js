@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs');
-const { checkPassword } = require('../utils/Validation');
+import bcrypt from 'bcryptjs';
+import { checkPassword } from '../utils/Validation';
 
 const TEMP_PASSWORD = 'Password123';
 

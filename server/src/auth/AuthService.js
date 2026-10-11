@@ -1,10 +1,11 @@
-const Auth = require('./Auth');
-const AuthRepository = require('./AuthRepository');
-const PasswordService = require('./PasswordService');
-const TokenService = require('./TokenService');
-const EmailService = require('../utils/EmailService');
-const { isValidEmail } = require('../utils/Validation');
-const { createError } = require('../middleware/ErrorMiddleware');
+import Auth from './Auth';
+import AuthRepository from './AuthRepository';
+import PasswordService from './PasswordService';
+import TokenService from './TokenService';
+import EmailService from '../utils/EmailService';
+import { isValidEmail } from '../utils/Validation';
+import { createError } from '../middleware/ErrorMiddleware';
+
 
 async function register(body) {
   const fullName = String(body.full_name || '').trim();

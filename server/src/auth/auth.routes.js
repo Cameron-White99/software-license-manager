@@ -1,8 +1,8 @@
-const express = require('express');
-const AuthService = require('./AuthService');
-const { asyncHandler } = require('../middleware/ErrorMiddleware');
-const { protect } = require('../middleware/AuthMiddleware');
-const { created, ok } = require('../utils/ApiResponse');
+import express from 'express';
+import AuthService from './AuthService';
+import { asyncHandler } from '../middleware/ErrorMiddleware';
+import { protect } from '../middleware/AuthMiddleware';
+import { created, ok } from '../utils/ApiResponse';
 
 const router = express.Router();
 
@@ -22,4 +22,4 @@ router.get('/me', protect, asyncHandler(async (req, res) => {
   ok(res, AuthService.currentUser(req.user));
 }));
 
-module.exports = router;
+export default router;

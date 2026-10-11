@@ -1,9 +1,10 @@
-const express = require('express');
-const UserService = require('./UserService');
-const { asyncHandler } = require('../middleware/ErrorMiddleware');
-const { protect } = require('../middleware/AuthMiddleware');
-const { isAdmin } = require('../middleware/RoleMiddleware');
-const { ok, created } = require('../utils/ApiResponse');
+import express from 'express';
+import UserService from './UserService';
+import { asyncHandler } from '../middleware/ErrorMiddleware';
+import { protect } from '../middleware/AuthMiddleware';
+import { isAdmin } from '../middleware/RoleMiddleware';
+import { ok, created } from '../utils/ApiResponse';
+
 
 const router = express.Router();
 
@@ -35,4 +36,4 @@ router.delete('/:id', protect, isAdmin, asyncHandler(async (req, res) => {
   ok(res, await UserService.remove(req.params.id, req.user));
 }));
 
-module.exports = router;
+export default router;

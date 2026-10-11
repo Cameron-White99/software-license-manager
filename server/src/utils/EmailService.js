@@ -8,4 +8,4 @@ class EmailService {
   }
 }
 
-module.exports = new EmailService();
+export default new EmailService();
