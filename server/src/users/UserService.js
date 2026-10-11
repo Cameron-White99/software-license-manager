@@ -1,9 +1,9 @@
-import UserRepository from './UserRepository';
-import UserFacade from './UserFacade';
-import PasswordService from '../auth/PasswordService';
-import TokenService from '../auth/TokenService';
-import { isValidEmail } from '../utils/Validation';
-import { createError } from '../middleware/ErrorMiddleware';
+import * as UserRepository from './UserRepository.js';
+import UserFacade from './UserFacade.js';
+import * as PasswordService from '../auth/PasswordService.js';
+import * as TokenService from '../auth/TokenService.js';
+import { isValidEmail } from '../utils/Validation.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 async function list() {
   return UserRepository.findAll();

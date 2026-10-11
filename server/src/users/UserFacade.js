@@ -1,8 +1,8 @@
-import UserRepository from './UserRepository';
-import LicenseRepository from '../licenses/LicenseRepository';
-import FeedbackRepository from '../feedback/FeedbackRepository';
-import NotificationRepository from '../notifications/NotificationRepository';
-import { createError } from '../middleware/ErrorMiddleware';
+import * as UserRepository from './UserRepository.js';
+import LicenseRepository from '../licenses/LicenseRepository.js';
+import FeedbackRepository from '../feedback/FeedbackRepository.js';
+import * as NotificationRepository from '../notifications/NotificationRepository.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 class UserFacade {
 	async deleteAccount(id, actor) {
