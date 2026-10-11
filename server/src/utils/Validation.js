@@ -10,4 +10,7 @@ function checkPassword(password) {
   return '';
 }
 
-module.exports = { isValidEmail, checkPassword };
+export {
+  isValidEmail,
+  checkPassword
+};
