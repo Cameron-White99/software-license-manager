@@ -1,5 +1,5 @@
-const { verify } = require('../auth/TokenService');
-const UserRepository = require('../users/UserRepository');
+import { verify } from '../auth/TokenService.js';
+import * as UserRepository from '../users/UserRepository.js';
 
 async function protect(req, res, next) {
   try {
@@ -19,4 +19,4 @@ async function protect(req, res, next) {
   }
 }
 
-module.exports = { protect };
+export { protect };

@@ -1,4 +1,4 @@
-const User = require('./User');
+import User from './User.js';
 
 async function findAll() {
 	return User.find().select('-password_hash').sort({ full_name: 1 });
@@ -36,7 +36,7 @@ function findActiveAdmins() {
 	return User.find({ role: 'admin', status: 'active' });
 }
 
-module.exports = {
+export {
 	findAll,
 	findById,
 	findByEmail,

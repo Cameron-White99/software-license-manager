@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const PublicUserAdapter = require('./PublicUserAdapter');
+import jwt from 'jsonwebtoken';
+import PublicUserAdapter from './PublicUserAdapter.js';
 
 function secret() {
   return process.env.JWT_SECRET || 'sl_assessment_dev_secret';
@@ -19,4 +19,4 @@ function publicUser(user) {
   return PublicUserAdapter.toPublic(user);
 }
 
-module.exports = { signToken, verify, publicUser };
+export { signToken, verify, publicUser };
