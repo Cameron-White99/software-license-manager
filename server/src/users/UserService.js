@@ -1,9 +1,9 @@
-const UserRepository = require('./UserRepository');
-const UserFacade = require('./UserFacade');
-const PasswordService = require('../auth/PasswordService');
-const TokenService = require('../auth/TokenService');
-const { isValidEmail } = require('../utils/Validation');
-const { createError } = require('../middleware/ErrorMiddleware');
+import UserRepository from './UserRepository';
+import UserFacade from './UserFacade';
+import PasswordService from '../auth/PasswordService';
+import TokenService from '../auth/TokenService';
+import { isValidEmail } from '../utils/Validation';
+import { createError } from '../middleware/ErrorMiddleware';
 
 async function list() {
   return UserRepository.findAll();
@@ -107,4 +107,12 @@ async function updatePassword(user, body) {
   return { message: 'Password updated.' };
 }
 
-module.exports = { list, create, update, updateStatus, remove, updateMe, updatePassword };
+export {
+  list,
+  create,
+  update,
+  updateStatus,
+  remove,
+  updateMe,
+  updatePassword
+};

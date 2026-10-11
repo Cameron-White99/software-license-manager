@@ -5,6 +5,15 @@ const { protect } = require('../middleware/AuthMiddleware');
 const { isAdmin } = require('../middleware/RoleMiddleware');
 const { ok, created } = require('../utils/ApiResponse');
 
+import express from 'express';
+
+import UserService from './UserService';
+import { asyncHandler } from '../middleware/ErrorMiddleware';
+import { protect } from '../middleware/AuthMiddleware';
+import { isAdmin } from '../middleware/RoleMiddleware';
+import { ok, created } from '../utils/ApiResponse';
+
+
 const router = express.Router();
 
 router.put('/me', protect, asyncHandler(async (req, res) => {
