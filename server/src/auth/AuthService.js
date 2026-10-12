@@ -74,4 +74,9 @@ function currentUser(user) {
   return TokenService.publicUser(user);
 }
 
-module.exports = { register, login, forgotPassword, currentUser };
+export {
+  register,
+  login,
+  forgotPassword,
+  currentUser
+};
