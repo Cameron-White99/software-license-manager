@@ -80,6 +80,19 @@ async function createFeedback(userId, data = {}) {
   }
 }
 
+/**
+ * SLM-196: Get feedback history for the signed-in user.
+ */
+async function getMyFeedback(userId) {
+  if (!mongoose.isValidObjectId(userId)) {
+    throw createError('Please sign in to view your feedback.', 401);
+  }
+
+  return FeedbackRepository.findByUser(userId);
+}
+
+
 export default {
-  createFeedback
+  createFeedback,
+    getMyFeedback
 };
