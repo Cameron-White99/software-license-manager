@@ -24,4 +24,25 @@ router.get(
   })
 );
 
+/**
+ * SLM-181: Submit feedback for a software version.
+ * POST /api/feedback
+ */
+router.post(
+  '/',
+  protect,
+  asyncHandler(async (req, res) => {
+    const feedback = await FeedbackService.createFeedback(
+      req.user._id,
+      req.body
+    );
+
+    return res.status(201).json({
+      message: 'Feedback submitted successfully.',
+      data: feedback
+    });
+  })
+);
+
+
 export default router;

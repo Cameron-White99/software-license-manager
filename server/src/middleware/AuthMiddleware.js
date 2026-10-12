@@ -1,5 +1,5 @@
 import { verify } from '../auth/TokenService.js';
-import * as UserRepository from '../users/UserRepository.js';
+import UserRepository from '../users/UserRepository.js';
 
 async function protect(req, res, next) {
   try {
