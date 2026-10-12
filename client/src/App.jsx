@@ -4,6 +4,8 @@ import Layout from './components/Layout';
 import SignIn from './pages/SignIn';
 import CreateAccount from './pages/CreateAccount';
 import Notifications from './pages/Notifications';
+import ResetPassword from './pages/ResetPassword';
+
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
@@ -41,6 +43,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
         {/* <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} /> */}
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/reset-password" element={<GuestOnly><ResetPassword /></GuestOnly>} />
       </Route>
     </Routes>
   );

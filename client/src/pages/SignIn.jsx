@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { Message } from '../components/ui';
 import Button from 'react-bootstrap/Button';
@@ -47,6 +47,16 @@ export default function SignIn() {
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Enter your password" value={password} onChange={(event) => setPassword(event.target.value)} required />
               </Form.Group>
+
+              <div className="text-end mb-3">
+                <Link
+                  to="/reset-password"
+                  className="small text-primary text-decoration-none"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
               <Button type="submit" className="w-100" disabled={busy}>{busy ? 'Signing in...' : 'Sign In'}</Button>
             </Form>
           </Card.Body>
