@@ -3,13 +3,13 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import requestRoutes from "./routes/requests.js";
-import assignmentRoutes from "./routes/assignments.js";
-import licenseRoute from './licenses/license.routes.js';
-import notificationRoute from './notifications/notification.routes.js';
-import softwareRoute from './software/software.routes.js';
+import requestRoutes from "./src/routes/requests.js";
+import assignmentRoutes from "./src/routes/assignments.js";
+import licenseRoute from './src/licenses/license.routes.js';
+import notificationRoute from './src/notifications/notification.routes.js';
+import softwareRoute from './src/software/software.routes.js';
 
-import  Database   from './database/Database.js';
+import  Database   from './src/database/Database.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

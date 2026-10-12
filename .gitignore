@@ -148,3 +148,5 @@ vite.config.ts.timestamp-*
 # stay tracked.
 NextSteps.md
 ReviewChecklist.md
+server/package-lock.json
+server/package.json

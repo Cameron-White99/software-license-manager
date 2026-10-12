@@ -1,10 +1,10 @@
-const LicenseRepository = require('./LicenseRepository');
-const SoftwareRepository = require('../software/SoftwareRepository');
-const VersionRepository = require('../versions/VersionRepository');
-const UserRepository = require('../users/UserRepository');
-const NotificationRepository = require('../notifications/NotificationRepository');
-const NotificationFactory = require('../notifications/NotificationFactory');
-const { createError } = require('../middleware/ErrorMiddleware');
+import LicenseRepository from './LicenseRepository.js';
+import SoftwareRepository from '../software/SoftwareRepository.js';
+import VersionRepository from '../versions/VersionRepository.js';
+import UserRepository from '../users/UserRepository.js';
+import NotificationRepository from '../notifications/NotificationRepository.js';
+import NotificationFactory from '../notifications/NotificationFactory.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 class LicenseFacade {
   async request(user, body) {
@@ -98,4 +98,4 @@ class LicenseFacade {
   }
 }
 
-module.exports = new LicenseFacade();
+export default new LicenseFacade();

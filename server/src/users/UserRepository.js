@@ -36,7 +36,7 @@ function findActiveAdmins() {
 	return User.find({ role: 'admin', status: 'active' });
 }
 
-export {
+export default{
 	findAll,
 	findById,
 	findByEmail,

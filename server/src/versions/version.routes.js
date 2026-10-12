@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 import VersionService from './VersionService';
-const { asyncHandler } = require('../middleware/ErrorMiddleware');
-import { protect } from '../middleware/AuthMiddleware';
-import { isAdmin } from '../middleware/RoleMiddleware';
-import { ok, created } from '../utils/ApiResponse';
+import { asyncHandler } from '../middleware/ErrorMiddleware.js';
+import { protect } from '../middleware/AuthMiddleware.js';
+import { isAdmin } from '../middleware/RoleMiddleware.js';
+import { ok, created } from '../utils/ApiResponse.js';
 
 const router = express.Router();
 
