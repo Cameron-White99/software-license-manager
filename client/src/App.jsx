@@ -6,6 +6,8 @@ import Layout from './components/Layout';
 import SignIn from './pages/SignIn';
 import CreateAccount from './pages/CreateAccount';
 import Notifications from './pages/Notifications';
+import ResetPassword from './pages/ResetPassword';
+
 
 import FeedbackForm from './pages/FeedbackForm';
 import PastFeedback from './pages/PastFeedback';
@@ -58,36 +60,6 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomeRedirect />} />
-
-        <Route
-          path="/login"
-          element={
-            user ? (
-              <p className="text-center text-secondary">
-                Signed in as {user.full_name}.
-              </p>
-            ) : (
-              <GuestOnly>
-                <SignIn />
-              </GuestOnly>
-            )
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            <GuestOnly>
-              <CreateAccount />
-            </GuestOnly>
-          }
-        />
-
-        <Route
-          path="/notifications"
-          element={<Notifications />}
-        />
-
         <Route
           path="/feedback"
           element={
@@ -105,11 +77,12 @@ export default function App() {
             </RequireAuth>
           }
         />
-
-        <Route
-          path="*"
-          element={<Navigate to="/login" replace />}
-        />
+        <Route path="/login" element={user ? <p className="text-center text-secondary">Signed in as {user.full_name}.</p> : <GuestOnly><SignIn /></GuestOnly>} />
+	      <Route path="/register" element={<GuestOnly><CreateAccount /></GuestOnly>} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/reset-password" element={<GuestOnly><ResetPassword /></GuestOnly>} />
       </Route>
     </Routes>
   );
