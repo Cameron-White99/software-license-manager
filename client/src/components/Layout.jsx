@@ -1,10 +1,26 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
+
+const userLinks = [
+  { to: '/software', label: 'Available Software' },
+  { to: '/licenses', label: 'My License History' },
+  { to: '/feedback', label: 'Feedback' },
+  { to: '/notifications', label: 'Notifications' },
+  { to: '/profile', label: 'Profile' },
+];
+
+const adminLinks = [
+  { to: '/admin/software', label: 'Software Catalog' },
+  { to: '/admin/versions', label: 'Version Releases' },
+  { to: '/admin/users', label: 'User Directory' },
+  { to: '/admin/requests', label: 'Request Queue' },
+  { to: '/notifications', label: 'Notifications' },
+];
 
 export default function Layout() {
   const { user, loading, logout } = useAuth();
@@ -19,30 +35,38 @@ export default function Layout() {
     );
   }
 
+  const links = user ? (user.role === 'admin' ? adminLinks : userLinks) : [];
+
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-      <Navbar bg="white" className="border-bottom">
+      <Navbar bg="white" expand="lg" className="border-bottom sticky-top">
         <Container>
-          <Navbar.Brand as={Link} to="/login" className="text-primary fw-bold">License Manager</Navbar.Brand>
-          <Nav className="ms-auto">
-            {user ? (
-              <Button
-                variant="link"
-                className="nav-link"
-                onClick={() => {
-                  logout();
-                  navigate('/login');
-                }}
-              >
-                Logout
-              </Button>
-            ) : (
-              <>
-                <Nav.Link as={Link} to="/login">Sign In</Nav.Link>
-                <Nav.Link as={Link} to="/register">Create Account</Nav.Link>
-              </>
-            )}
-          </Nav>
+          <Navbar.Brand as={Link} to="/" className="text-primary fw-bold">License Manager</Navbar.Brand>
+          <Navbar.Toggle aria-controls="main-nav" />
+          <Navbar.Collapse id="main-nav">
+            <Nav className="ms-auto align-items-lg-center">
+              {links.map((link) => (
+                <Nav.Link key={link.to} as={NavLink} to={link.to}>{link.label}</Nav.Link>
+              ))}
+              {user ? (
+                <Button
+                  variant="link"
+                  className="nav-link"
+                  onClick={() => {
+                    logout();
+                    navigate('/login');
+                  }}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  <Nav.Link as={Link} to="/login">Sign In</Nav.Link>
+                  <Button as={Link} to="/register" variant="outline-primary" size="sm" className="ms-lg-2">Create Account</Button>
+                </>
+              )}
+            </Nav>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
       <main className="flex-grow-1 py-4">
