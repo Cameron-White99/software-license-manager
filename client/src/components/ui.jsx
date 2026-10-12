@@ -1,4 +1,4 @@
-import Alert from 'react-bootstrap/Alert';
+import BootstrapAlert from 'react-bootstrap/Alert';
 import Badge from 'react-bootstrap/Badge';
 import Form from 'react-bootstrap/Form';
 import Stack from 'react-bootstrap/Stack';
@@ -6,7 +6,11 @@ import Stack from 'react-bootstrap/Stack';
 export function Message({ type = 'error', children }) {
   if (!children) return null;
   const variant = type === 'error' ? 'danger' : type;
-  return <Alert variant={variant}>{children}</Alert>;
+  return <BootstrapAlert variant={variant}>{children}</BootstrapAlert>;
+}
+
+export function Alert(props) {
+  return <Message {...props} />;
 }
 
 export function SearchBox({ label, value, onChange, placeholder }) {
