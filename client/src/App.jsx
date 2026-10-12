@@ -8,7 +8,7 @@ import CreateAccount from './pages/CreateAccount';
 import Notifications from './pages/Notifications';
 
 import FeedbackForm from './pages/FeedbackForm';
-
+import PastFeedback from './pages/PastFeedback';
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
@@ -97,6 +97,14 @@ export default function App() {
           }
         />
 
+        <Route
+          path="/feedback/history"
+          element={
+            <RequireAuth role="user">
+              <PastFeedback />
+            </RequireAuth>
+          }
+        />
 
         <Route
           path="*"
