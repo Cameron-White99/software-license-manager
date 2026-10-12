@@ -1,4 +1,4 @@
-import SoftwareVersion from './SoftwareVersion';
+import SoftwareVersion from './SoftwareVersion.js';
 
 function findBySoftwareIds(ids) {
   return SoftwareVersion.find({ software: { $in: ids } }).sort({ release_date: -1, _id: -1 });

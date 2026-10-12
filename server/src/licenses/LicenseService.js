@@ -1,5 +1,5 @@
-import LicenseRepository from './LicenseRepository';
-import { createError } from '../middleware/ErrorMiddleware';
+import LicenseRepository from './LicenseRepository.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 function listForUser(userId) {
   return LicenseRepository.findByUser(userId);
