@@ -1,8 +1,8 @@
-const UserRepository = require('./UserRepository');
-const LicenseRepository = require('../licenses/LicenseRepository');
-const FeedbackRepository = require('../feedback/FeedbackRepository');
-const NotificationRepository = require('../notifications/NotificationRepository');
-const { createError } = require('../middleware/ErrorMiddleware');
+import UserRepository from './UserRepository';
+import LicenseRepository from '../licenses/LicenseRepository';
+import FeedbackRepository from '../feedback/FeedbackRepository';
+import NotificationRepository from '../notifications/NotificationRepository';
+import { createError } from '../middleware/ErrorMiddleware';
 
 class UserFacade {
 	async deleteAccount(id, actor) {
@@ -20,4 +20,4 @@ class UserFacade {
 	}
 }
 
-module.exports = new UserFacade();
+export default new UserFacade();

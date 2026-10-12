@@ -1,4 +1,4 @@
-const UserRepository = require('../users/UserRepository');
+import UserRepository from '../users/UserRepository';
 
 function findByEmail(email) {
   return UserRepository.findByEmail(email);
@@ -12,4 +12,8 @@ function save(user) {
   return UserRepository.save(user);
 }
 
-module.exports = { findByEmail, create, save };
+export {
+  findByEmail,
+  create,
+  save
+};

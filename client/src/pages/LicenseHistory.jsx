@@ -1,75 +1,99 @@
-import { useEffect, useState } from "react";
-import Header from "../components/Header.jsx";
-import { fetchMyHistory } from "../api/assignments.js";
-import { formatDate } from "../utils/date.js";
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { api } from '../api';
+import { Message, PageHeader, SearchBox, StatusBadge } from '../components/ui';
+import { formatDate } from '../utils/format';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import Table from 'react-bootstrap/Table';
 
-// R8: User views licenses whose access has been revoked.
-// Mirrors the R8-LicenseHistory Figma frame: a read-only list - no actions,
-// since a user cannot restore their own access. Active licenses live on the
-// R4 My Licenses screen; this one is only ever revoked records.
+const labels = { Approved: 'Active', Pending: 'Pending', Rejected: 'Rejected', Expired: 'Expired' };
+
 export default function LicenseHistory() {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
+  const location = useLocation();
+  const [items, setItems] = useState([]);
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(location.state?.message || '');
 
-  useEffect(() => {
-    let active = true;
+  function load() {
+    api('/api/licenses/mine').then(setItems).catch((err) => setError(err.message));
+  }
 
-    async function load() {
-      setLoading(true);
-      setLoadError("");
-      try {
-        const data = await fetchMyHistory();
-        if (active) setHistory(data);
-      } catch (err) {
-        if (active) setLoadError(err.message);
-      } finally {
-        if (active) setLoading(false);
-      }
+  useEffect(() => { load(); }, []);
+
+  async function cancel(id) {
+    if (!window.confirm('Cancel this subscription?')) return;
+    setError('');
+    try {
+      await api(`/api/licenses/${id}/cancel`, { method: 'PATCH' });
+      setSuccess('Subscription cancelled.');
+      load();
+    } catch (err) {
+      setError(err.message);
     }
+  }
 
-    load();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const visible = items.filter((item) => {
+    const haystack = [
+      item.assigned_software?.software_name,
+      item.version_number?.version_number,
+      labels[item.status],
+    ].join(' ').toLowerCase();
+    return haystack.includes(query.toLowerCase());
+  });
 
   return (
-    <>
-      <Header role="User" />
-      <div className="content">
-        <div className="card wide">
-          <h2>License History</h2>
-
-          {loadError && <div className="banner">{loadError}</div>}
-
-          {loading ? (
-            <div className="empty-text">Loading your history…</div>
-          ) : history.length === 0 ? (
-            <div className="empty-text">None of your licenses have been revoked.</div>
-          ) : (
-            <ul className="request-list">
-              {history.map((assignment) => (
-                <li key={assignment._id} className="request-row">
-                  <div className="request-main">
-                    <div className="request-product">
-                      {assignment.licenseId?.productName ?? "Unknown product"}
-                    </div>
-                    <div className="request-meta">
-                      {/* updatedAt is when the revoke happened; createdAt is when
-                          the seat was first assigned. */}
-                      Revoked {formatDate(assignment.updatedAt)}
-                    </div>
-                  </div>
-                  <span className={`status-badge ${assignment.status.toLowerCase()}`}>
-                    {assignment.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </>
+    <section>
+      <PageHeader title="My Software License History" />
+      <Message type="success">{success}</Message>
+      <Message>{error}</Message>
+      <Card>
+        <Card.Body className="pb-0">
+          <SearchBox label="SEARCH:" value={query} onChange={setQuery} placeholder="Search by product, version, or status..." />
+        </Card.Body>
+        <Table responsive hover className="mb-0 align-middle">
+          <thead>
+            <tr className="text-secondary small">
+              <th>SOFTWARE NAME</th>
+              <th>VERSION</th>
+              <th>REQUESTED</th>
+              <th>REVIEWED</th>
+              <th>EXPIRES AT</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((item) => {
+              const label = labels[item.status] || item.status;
+              const version = item.version_number?.version_number;
+              const feedbackTo = item.version_number
+                ? `/feedback/new?version=${item.version_number._id}&name=${encodeURIComponent(`${item.assigned_software?.software_name || ''} ${version}`)}`
+                : '';
+              return (
+                <tr key={item._id}>
+                  <td className="fw-semibold">{item.assigned_software?.software_name}</td>
+                  <td>{version || '—'}</td>
+                  <td>{formatDate(item.requested_at)}</td>
+                  <td>{item.status === 'Pending' ? 'Pending Review' : formatDate(item.reviewed_at)}</td>
+                  <td>{item.status === 'Pending' || item.status === 'Rejected' ? '—' : formatDate(item.expires_at)}</td>
+                  <td><StatusBadge value={label} /></td>
+                  <td className="text-end text-nowrap">
+                    {item.status === 'Approved' ? (
+                      <Button variant="outline-danger" size="sm" className="me-2" type="button" onClick={() => cancel(item._id)}>Cancel Subscription</Button>
+                    ) : null}
+                    {feedbackTo && item.status !== 'Pending' ? (
+                      <Button as={Link} to={feedbackTo} variant="outline-primary" size="sm">Give Feedback</Button>
+                    ) : null}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        {visible.length === 0 ? <p className="text-center text-secondary py-4 mb-0">No licenses match your search.</p> : null}
+      </Card>
+    </section>
   );
 }

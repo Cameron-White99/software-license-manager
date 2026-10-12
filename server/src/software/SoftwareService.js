@@ -1,5 +1,5 @@
-const SoftwareRepository = require('./SoftwareRepository');
-const { createError } = require('../middleware/ErrorMiddleware');
+import * as SoftwareRepository from './SoftwareRepository.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 async function create(body) {
   const name = String(body.software_name || '').trim();

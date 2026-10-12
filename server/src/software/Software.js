@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const softwareSchema = new mongoose.Schema({
   software_name: { type: String, required: true, trim: true },
@@ -6,4 +6,4 @@ const softwareSchema = new mongoose.Schema({
   deleted_at: { type: Date, default: null },
 });
 
-module.exports = mongoose.model('software', softwareSchema);
+export default mongoose.model('software', softwareSchema);
