@@ -9,6 +9,12 @@ import licenseRoute from './src/licenses/license.routes.js';
 import notificationRoute from './src/notifications/notification.routes.js';
 import softwareRoute from './src/software/software.routes.js';
 
+import feedbackRoutes from './src/feedback/feedback.routes.js';
+
+import { errorHandler } from './src/middleware/ErrorMiddleware.js';
+
+
+
 import  Database   from './src/database/Database.js';
 dotenv.config();
 
@@ -25,6 +31,9 @@ app.use("/api/assignments", assignmentRoutes);
 app.use('/api/software', softwareRoute);
 app.use('/api/licenses', licenseRoute);
 app.use("/api/notifications", notificationRoute);
+
+app.use('/api/feedback', feedbackRoutes);
+
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // Serve the built React app (run `npm run build` in /client first).
@@ -37,6 +46,9 @@ app.use(express.static(CLIENT_DIST));
 app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(CLIENT_DIST, "index.html"));
 });
+
+// Centralized error handling for API routes.
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 80;
 
