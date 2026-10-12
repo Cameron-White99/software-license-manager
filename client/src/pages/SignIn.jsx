@@ -21,8 +21,8 @@ export default function SignIn() {
     setError('');
     setBusy(true);
     try {
-      await login(email, password);
-      navigate('/login', { replace: true });
+      const user = await login(email, password);
+      navigate(user.role === 'admin' ? '/admin/software' : '/software', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,19 +47,15 @@ export default function SignIn() {
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Enter your password" value={password} onChange={(event) => setPassword(event.target.value)} required />
               </Form.Group>
-
               <div className="text-end mb-3">
-                <Link
-                  to="/reset-password"
-                  className="small text-primary text-decoration-none"
-                >
-                  Forgot Password?
-                </Link>
+                <Link to="/reset-password">Forgot password?</Link>
               </div>
-
               <Button type="submit" className="w-100" disabled={busy}>{busy ? 'Signing in...' : 'Sign In'}</Button>
             </Form>
           </Card.Body>
+          <Card.Footer className="text-center text-secondary bg-light">
+            Don&apos;t have an account? <Link to="/register">Register here</Link>
+          </Card.Footer>
         </Card>
       </Col>
     </Row>
