@@ -15,4 +15,9 @@ function validate(password) {
   return checkPassword(password);
 }
 
-module.exports = { hash, compare, validate, TEMP_PASSWORD };
+export {
+  hash,
+  compare,
+  validate,
+  TEMP_PASSWORD
+};
