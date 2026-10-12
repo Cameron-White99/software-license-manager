@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const softwareVersionSchema = new mongoose.Schema({
   version_number: { type: String, required: true, unique: true, trim: true },

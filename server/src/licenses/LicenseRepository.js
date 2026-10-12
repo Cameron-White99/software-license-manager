@@ -1,4 +1,4 @@
-import License from './License';
+import License from './License.js';
 
 function withDetails(query) {
   return query
