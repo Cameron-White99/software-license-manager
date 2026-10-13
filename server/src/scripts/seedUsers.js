@@ -9,14 +9,14 @@ const DEMO_USERS = [
   {
     full_name: "Demo Admin",
     email: process.env.SEED_ADMIN_EMAIL || "admin@example.com",
-    password: process.env.SEED_ADMIN_PASSWORD,
+    password: process.env.SEED_ADMIN_PASSWORD || "Password123!",
     passwordVar: "SEED_ADMIN_PASSWORD",
     role: "admin",
   },
   {
     full_name: "Demo User",
     email: process.env.SEED_USER_EMAIL || "user@example.com",
-    password: process.env.SEED_USER_PASSWORD,
+    password: process.env.SEED_USER_PASSWORD || "Password123!",
     passwordVar: "SEED_USER_PASSWORD",
     role: "user",
   },

@@ -8,23 +8,6 @@ import Assignment from "../models/Assignment.js";
 
 dotenv.config();
 
-// Resets the database to a clean, demo-ready state: clears every collection,
-// then reseeds demo users, licence inventory, one request in each status and one
-// active assignment. The point is that someone opening the deployed app sees a
-// populated, working system rather than a wall of empty states.
-//
-// DESTRUCTIVE: it deletes everything in the target database. It prints the
-// database it is connected to, and the document counts it is about to remove,
-// before deleting anything - check that line before running it anywhere real.
-//
-// Usage:  npm run reset:demo          (uses MONGO_URI from .env, same as the app)
-
-// These MUST stay in step with server/src/scripts/seedUsers.js, which is the
-// original source of these ids, and with client/src/api/session.js, which sends
-// them as the x-user-id header. They are copied rather than imported because
-// seedUsers.js neither exports them nor is import-safe - it runs its seed at
-// module top level, so importing it would trigger a second seed and close the
-// connection out from under this script.
 const DEMO_ADMIN_ID = new mongoose.Types.ObjectId("000000000000000000000001");
 const DEMO_USER_ID = new mongoose.Types.ObjectId("000000000000000000000002");
 
@@ -39,9 +22,6 @@ const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 async function resetDemo() {
   await connectDB();
 
-  // Print the target before touching anything, so it is verifiable which
-  // database is being reset - this matters most on Atlas, where a URI without a
-  // path segment silently lands on the default database rather than a named one.
   const { name, host } = mongoose.connection;
   console.log(`\nTarget database: "${name}"  (host: ${host})`);
 

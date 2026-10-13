@@ -3,19 +3,6 @@ import licenseRoutes from "../routes/licenses.js";
 import requestRoutes from "../routes/requests.js";
 import assignmentRoutes from "../routes/assignments.js";
 
-// RBAC consolidation: one place that proves the whole role-based access surface,
-// rather than the per-feature checks scattered across R1-R4's verification.
-//
-// Two parts:
-//   1. AUDIT  - walks Express's actual router stack and reports every registered
-//               route and whether it carries a requireRole guard. Reading the
-//               router stack rather than grepping means a route registered
-//               anywhere still shows up here.
-//   2. PROBE  - hits every Admin-only endpoint as a User and every User-only
-//               endpoint as an Admin, asserting 403 across the board.
-//
-// The probe needs a running server (npm run dev). The audit does not.
-
 const DEMO_ADMIN_ID = "000000000000000000000001";
 const DEMO_USER_ID = "000000000000000000000002";
 
