@@ -1,12 +1,26 @@
-name: CI
+name: CI/CD
 
-# Build check and RBAC audit on every push and pull request.
-# No deployment: deploying to EC2 is a manual, documented procedure (see README).
+# build  - every push and pull request, on a GitHub-hosted runner.
+# deploy - pushes to main only, on the self-hosted runner installed on the EC2
+#          instance, and only once build has passed.
+#
+# One-time instance setup (runner registration, required secrets) is documented
+# in README.md under "Deployment > CI/CD pipeline".
 on:
   push:
     branches: ["**"]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels an in-flight run - except on main,
+# where cancelling a half-finished deploy would leave the instance in an
+# unknown state.
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
@@ -19,6 +33,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
 
       - name: Install server dependencies
         working-directory: server
@@ -40,3 +58,107 @@ jobs:
       - name: RBAC audit (unguarded routes fail the build)
         working-directory: server
         run: npm run rbac:audit
+
+      # The built bundle is handed to the deploy job as an artifact rather than
+      # rebuilt on the instance: a t2.micro has 1 GB of RAM, where a Vite build
+      # is slow at best and an out-of-memory kill at worst.
+      - name: Upload client build
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist
+          retention-days: 7
+          if-no-files-found: error
+
+  # Requires the self-hosted runner registered on EC2 and the MONGO_URI secret
+  # set (see README).
+  #
+  # The app runs from its own folder, software-license-manager2, separate from
+  # the runner workspace. The earlier version in the software-license-manager
+  # folder is never touched, and runs under a different pm2 app name.
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: self-hosted
+    env:
+      # Override with a repository variable DEPLOY_DIR if the instance user
+      # is not "ubuntu".
+      DEPLOY_DIR: ${{ vars.DEPLOY_DIR || '/home/ubuntu/software-license-manager2' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # server/server.js serves ../client/dist as static files, so the bundle
+      # built in the build job must sit next to server/ in the deploy folder.
+      - name: Download client build
+        uses: actions/download-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist
+
+      # Copies the checkout into the deploy folder. node_modules and .env are
+      # excluded so they survive between deploys (and --delete leaves them alone).
+      - name: Sync to deploy folder
+        run: |
+          mkdir -p "$DEPLOY_DIR"
+          rsync -a --delete --exclude '.git' --exclude 'node_modules' --exclude '.env' ./ "$DEPLOY_DIR"/
+
+      # .env is git-ignored, so it is rebuilt from repository secrets on every
+      # deploy rather than left lying around on the instance.
+      - name: Write server environment file
+        working-directory: ${{ env.DEPLOY_DIR }}/server
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          PORT: ${{ secrets.PORT || '3001' }}
+        run: |
+          if [ -z "$MONGO_URI" ]; then
+            echo "::error::Repository secret MONGO_URI is not set - see README, 'CI/CD pipeline'."
+            exit 1
+          fi
+          umask 077
+          printf 'PORT=%s
+MONGO_URI=%s
+' "$PORT" "$MONGO_URI" > .env
+
+      - name: Install server dependencies
+        working-directory: ${{ env.DEPLOY_DIR }}/server
+        run: npm ci --omit=dev
+
+      # Idempotent (see README, "Seeding demo accounts"), so it is safe to run on
+      # every deploy and keeps a fresh instance usable without a manual step.
+      - name: Seed demo accounts
+        working-directory: ${{ env.DEPLOY_DIR }}/server
+        run: npm run seed
+
+      - name: Ensure pm2 is installed
+        run: command -v pm2 >/dev/null || sudo npm install -g pm2
+
+      # The runner kills every process tagged with RUNNER_TRACKING_ID when the
+      # job ends, which would take down pm2 and the app. Clearing it lets pm2
+      # outlive the job.
+      - name: Start or restart the app
+        working-directory: ${{ env.DEPLOY_DIR }}/server
+        env:
+          RUNNER_TRACKING_ID: ""
+        run: |
+          pm2 startOrRestart ecosystem.config.cjs --update-env
+          pm2 save
+
+      # Proves the deploy actually serves traffic rather than just that pm2
+      # accepted the command. On failure, dumps the app log into the job output
+      # so the run itself shows why, and fails the deploy.
+      - name: Health check
+        env:
+          PORT: ${{ secrets.PORT || '3001' }}
+        run: |
+          for _ in $(seq 1 15); do
+            if curl -fsS "http://127.0.0.1:${PORT}/api/health" | grep -q '"ok"'; then
+              echo "Health check passed on port ${PORT}."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::App did not become healthy on port ${PORT} within 30s."
+          pm2 logs license-manager2 --lines 50 --nostream || true
+          exit 1
