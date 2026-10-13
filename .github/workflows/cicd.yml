@@ -121,11 +121,12 @@ jobs:
             fi
           done
           umask 077
-          printf 'PORT=%s
-MONGODB_URI=%s
-MONGODB_DB_NAME=%s
-JWT_SECRET=%s
-'             "$PORT" "$MONGODB_URI" "$MONGODB_DB_NAME" "$JWT_SECRET" > .env
+          {
+            echo "PORT=$PORT"
+            echo "MONGODB_URI=$MONGODB_URI"
+            echo "MONGODB_DB_NAME=$MONGODB_DB_NAME"
+            echo "JWT_SECRET=$JWT_SECRET"
+          } > .env
 
       - name: Install server dependencies
         working-directory: ${{ env.DEPLOY_DIR }}/server
