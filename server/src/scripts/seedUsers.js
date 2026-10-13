@@ -1,35 +1,73 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { connectDB } from "../config/db.js";
-import User from "../models/User.js";
+import User from "../users/User.js";
+import PasswordService from "../auth/PasswordService.js";
 
 dotenv.config();
-
-// R1 support: authentication is out of scope (see Phase 1 assumptions), but a
-// Request still needs a real userId to reference. These two demo accounts stand
-// in for the logged-in Admin and User. The _ids are fixed so the client can send
-// them in the x-user-id header without a login flow — see client/src/api/session.js.
 const DEMO_USERS = [
   {
-    _id: new mongoose.Types.ObjectId("000000000000000000000001"),
-    name: "Demo Admin",
-    email: "admin@example.com",
-    role: "Admin",
+    full_name: "Demo Admin",
+    email: process.env.SEED_ADMIN_EMAIL || "admin@example.com",
+    password: process.env.SEED_ADMIN_PASSWORD,
+    passwordVar: "SEED_ADMIN_PASSWORD",
+    role: "admin",
   },
   {
-    _id: new mongoose.Types.ObjectId("000000000000000000000002"),
-    name: "Demo User",
-    email: "user@example.com",
-    role: "User",
+    full_name: "Demo User",
+    email: process.env.SEED_USER_EMAIL || "user@example.com",
+    password: process.env.SEED_USER_PASSWORD,
+    passwordVar: "SEED_USER_PASSWORD",
+    role: "user",
   },
 ];
 
-async function seed() {
-  await connectDB();
-  for (const user of DEMO_USERS) {
-    await User.findByIdAndUpdate(user._id, user, { upsert: true, new: true });
-    console.log(`Seeded ${user.role}: ${user.email} (${user._id})`);
+function checkEnv() {
+  const problems = [];
+  for (const u of DEMO_USERS) {
+    if (!u.password) {
+      problems.push(`${u.passwordVar} is not set.`);
+      continue;
+    }
+    const error = PasswordService.validate(u.password);
+    if (error) problems.push(`${u.passwordVar}: ${error}`);
   }
+  if (problems.length) {
+    console.error(`Cannot seed demo accounts:\n  ${problems.join("\n  ")}`);
+    process.exit(1);
+  }
+}
+
+async function seed() {
+  checkEnv();
+  await connectDB();
+
+  for (const u of DEMO_USERS) {
+    const email = u.email.trim().toLowerCase();
+    const existing = await User.findOne({ email });
+
+    if (!existing) {
+      await User.create({
+        full_name: u.full_name,
+        email,
+        password_hash: await PasswordService.hash(u.password),
+        role: u.role,
+        status: "active",
+      });
+      console.log(`Created ${u.role}: ${email}`);
+      continue;
+    }
+
+    existing.full_name = u.full_name;
+    existing.role = u.role;
+    existing.status = "active";
+    if (!existing.password_hash) {
+      existing.password_hash = await PasswordService.hash(u.password);
+    }
+    await existing.save();
+    console.log(`Updated ${u.role}: ${email}`);
+  }
+
   await mongoose.connection.close();
 }
 

@@ -124,6 +124,8 @@ jobs:
           {
             echo "PORT=$PORT"
             echo "MONGODB_URI=$MONGODB_URI"
+            # The seed script (src/config/db.js) reads MONGO_URI, not MONGODB_URI.
+            echo "MONGO_URI=$MONGODB_URI"
             echo "MONGODB_DB_NAME=$MONGODB_DB_NAME"
             echo "JWT_SECRET=$JWT_SECRET"
           } > .env
@@ -136,6 +138,9 @@ jobs:
       # every deploy and keeps a fresh instance usable without a manual step.
       - name: Seed demo accounts
         working-directory: ${{ env.DEPLOY_DIR }}/server
+        env:
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+          SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
         run: npm run seed
 
       - name: Ensure pm2 is installed
