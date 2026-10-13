@@ -3,8 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import requestRoutes from "./src/routes/requests.js";
-import assignmentRoutes from "./src/routes/assignments.js";
+import versionRoute from './src/versions/version.routes.js';
+import authRoutes from './src/auth/auth.routes.js';
+import userRoutes from './src/users/user.routes.js';
 import licenseRoute from './src/licenses/license.routes.js';
 import notificationRoute from './src/notifications/notification.routes.js';
 import softwareRoute from './src/software/software.routes.js';
@@ -25,16 +26,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/requests", requestRoutes);
-app.use("/api/assignments", assignmentRoutes);
+
+app.use('/api/versions', versionRoute);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
 
 app.use('/api/software', softwareRoute);
 app.use('/api/licenses', licenseRoute);
-app.use("/api/notifications", notificationRoute);
-
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/notifications', notificationRoute);
 
-app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+app.use(errorHandler);
+
 
 // Serve the built React app (run `npm run build` in /client first).
 // In local dev, run the Vite dev server separately instead — this static

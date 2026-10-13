@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { checkPassword } from '../utils/Validation';
+import { checkPassword } from '../utils/Validation.js';
 
 const TEMP_PASSWORD = 'Password123';
 
@@ -15,7 +15,7 @@ function validate(password) {
   return checkPassword(password);
 }
 
-export {
+export default {
   hash,
   compare,
   validate,

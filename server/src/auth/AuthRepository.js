@@ -1,4 +1,4 @@
-import UserRepository from '../users/UserRepository';
+import UserRepository from '../users/UserRepository.js';
 
 function findByEmail(email) {
   return UserRepository.findByEmail(email);
@@ -12,7 +12,7 @@ function save(user) {
   return UserRepository.save(user);
 }
 
-export {
+export default {
   findByEmail,
   create,
   save

@@ -1,7 +1,7 @@
-import VersionRepository from './VersionRepository';
-import SoftwareRepository from '../software/SoftwareRepository';
-import LicenseRepository from '../licenses/LicenseRepository';
-import { createError } from '../middleware/ErrorMiddleware';
+import VersionRepository from './VersionRepository.js';
+import SoftwareRepository from '../software/SoftwareRepository.js';
+import LicenseRepository from '../licenses/LicenseRepository.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 async function list() {
   const versions = await VersionRepository.findAllWithSoftware();
