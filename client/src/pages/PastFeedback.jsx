@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchMyFeedback } from '../api/feedback.js';
-import Header from '../components/Header.jsx';
 
 import Card from 'react-bootstrap/Card';
 import Alert from 'react-bootstrap/Alert';
@@ -48,8 +47,6 @@ export default function PastFeedback() {
 
   return (
     <>
-      <Header role="User" />
-
       <div className="container py-5" style={{ maxWidth: '900px' }}>
         <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
           <div>
@@ -58,10 +55,6 @@ export default function PastFeedback() {
               View feedback you have submitted for software versions.
             </p>
           </div>
-
-          <Button as={Link} to="/feedback">
-            Add Feedback
-          </Button>
         </div>
 
         {error && (

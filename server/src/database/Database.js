@@ -19,10 +19,10 @@ class Database {
 
   async connect() {
     if (this.connected) return;
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sl_assessment';
+    const uri = process.env.MONGODB_URI;
     if (!uri) throw new Error("Set MONGODB_URI in the server .env file");
     mongoose.set("strictQuery", true);
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 30000 });
+    await mongoose.connect(uri, { dbName: process.env.MONGODB_DB_NAME,serverSelectionTimeoutMS: 30000 });
     console.log("Connected to MongoDB");
     this.connected = true;
   }

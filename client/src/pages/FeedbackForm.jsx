@@ -1,9 +1,8 @@
 
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { fetchFeedbackVersions, fetchMyFeedback, submitFeedback } from '../api/feedback.js';
-import Header from '../components/Header.jsx';
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -24,6 +23,9 @@ export default function FeedbackForm() {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [searchParams] = useSearchParams();
+  const versionId = searchParams.get('version_id');
 
   // SLM-162: Load software versions and previously submitted feedback.
   useEffect(() => {
@@ -46,6 +48,7 @@ export default function FeedbackForm() {
 
         if (active) {
           setVersions(versionList);
+
           setExistingFeedback(feedbackList);
         }
       } catch (err) {
@@ -67,17 +70,17 @@ export default function FeedbackForm() {
   }, []);
 
   // Prevent submitting feedback twice for the same software version.
-  const submittedVersionIds = new Set(
-    existingFeedback.map((item) =>
-      typeof item.version === 'object'
-        ? String(item.version?._id)
-        : String(item.version)
-    )
-  );
+  const submittedVersionIds = new Set([]);
 
   const availableVersions = versions.filter(
     (item) => !submittedVersionIds.has(String(item._id))
   );
+
+  useEffect(() => {
+    if (!versionId) return;
+    const match = availableVersions.some((item) => String(item._id) === versionId);
+    if (match) setVersion(versionId);
+  }, [versionId, availableVersions]);
 
   // SLM-162: Validate and submit feedback.
   async function handleSubmit(event) {
@@ -120,7 +123,6 @@ export default function FeedbackForm() {
     setSubmitting(true);
 
     try {
-      // Backend expects versionId, not version.
       const createdFeedback = await submitFeedback({
         versionId: version,
         rating: selectedRating,
@@ -131,7 +133,6 @@ export default function FeedbackForm() {
         throw new Error('Invalid feedback submission response.');
       }
 
-      // Add the new feedback locally so the version is no longer selectable.
       setExistingFeedback((previous) => [
         createdFeedback,
         ...previous
@@ -149,11 +150,8 @@ export default function FeedbackForm() {
       setSubmitting(false);
     }
   }
-
   return (
     <>
-      <Header role="User" />
-
       <div className="container py-5">
         <Card
           className="mx-auto border-0 shadow-sm"

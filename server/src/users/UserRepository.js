@@ -9,7 +9,8 @@ function findById(id) {
 }
 
 function findByEmail(email) {
-	return User.findOne({ email });
+	console.log(email);
+	return User.findOne({ email:email });
 }
 
 function findByEmailExcluding(email, id) {
