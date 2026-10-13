@@ -2,7 +2,7 @@ export async function api(path, options = {}) {
   const token = localStorage.getItem('token');
   let response;
   try {
-    response = await fetch('http://localhost:5000'+path, {
+    response = await fetch(path, {
       method: options.method || 'GET',
       headers: {
         'Content-Type': 'application/json',
