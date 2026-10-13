@@ -69,7 +69,7 @@ export default function LicenseHistory() {
               const label = labels[item.status] || item.status;
               const version = item.version_number?.version_number;
               const feedbackTo = item.version_number
-                ? `/feedback/new?version=${item.version_number._id}&name=${encodeURIComponent(`${item.assigned_software?.software_name || ''} ${version}`)}`
+                ? `/feedback/new?version_id=${item.version_number._id}`
                 : '';
               return (
                 <tr key={item._id}>

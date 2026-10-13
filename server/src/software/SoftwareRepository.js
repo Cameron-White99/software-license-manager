@@ -24,7 +24,7 @@ function save(software) {
   return software.save();
 }
 
-export default{
+export default {
   findActive,
   findActiveById,
   findActiveByName,

@@ -11,6 +11,7 @@ router.post('/register', asyncHandler(async (req, res) => {
 }));
 
 router.post('/login', asyncHandler(async (req, res) => {
+  console.log(req.body);
   ok(res, await AuthService.login(req.body));
 }));
 

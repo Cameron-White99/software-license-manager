@@ -39,6 +39,7 @@ async function login(body) {
   if (!email || !password) throw createError('Email and password are required.');
 
   const user = await AuthRepository.findByEmail(email);
+  console.log(user);
   if (!user) throw createError('Incorrect email or password.', 401);
   if (user.status === 'blocked') throw createError('This account is blocked.', 403);
 

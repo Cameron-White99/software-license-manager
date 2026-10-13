@@ -20,4 +20,4 @@ class NotificationFactory {
     }
   }
   
-  export default new NotificationFactory();
+  export default NotificationFactory;
