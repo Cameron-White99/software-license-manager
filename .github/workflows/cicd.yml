@@ -70,7 +70,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  # Requires the self-hosted runner registered on EC2 and the MONGO_URI secret
+  # Requires the self-hosted runner registered on EC2 and the MONGODB_URI and JWT_SECRET secrets
   # set (see README).
   #
   # The app runs from its own folder, software-license-manager2, separate from
@@ -109,17 +109,23 @@ jobs:
       - name: Write server environment file
         working-directory: ${{ env.DEPLOY_DIR }}/server
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB_NAME: ${{ secrets.MONGODB_DB_NAME }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
           PORT: ${{ secrets.PORT || '3001' }}
         run: |
-          if [ -z "$MONGO_URI" ]; then
-            echo "::error::Repository secret MONGO_URI is not set - see README, 'CI/CD pipeline'."
-            exit 1
-          fi
+          for v in MONGODB_URI JWT_SECRET; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Repository secret $v is not set - see README, 'CI/CD pipeline'."
+              exit 1
+            fi
+          done
           umask 077
           printf 'PORT=%s
-MONGO_URI=%s
-' "$PORT" "$MONGO_URI" > .env
+MONGODB_URI=%s
+MONGODB_DB_NAME=%s
+JWT_SECRET=%s
+'             "$PORT" "$MONGODB_URI" "$MONGODB_DB_NAME" "$JWT_SECRET" > .env
 
       - name: Install server dependencies
         working-directory: ${{ env.DEPLOY_DIR }}/server
