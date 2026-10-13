@@ -19,4 +19,8 @@ function publicUser(user) {
   return PublicUserAdapter.toPublic(user);
 }
 
-export { signToken, verify, publicUser };
+export default {
+  signToken,
+  verify,
+  publicUser,
+};

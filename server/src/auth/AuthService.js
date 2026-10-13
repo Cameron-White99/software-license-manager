@@ -1,10 +1,10 @@
-import Auth from './Auth';
-import AuthRepository from './AuthRepository';
-import PasswordService from './PasswordService';
-import TokenService from './TokenService';
-import EmailService from '../utils/EmailService';
-import { isValidEmail } from '../utils/Validation';
-import { createError } from '../middleware/ErrorMiddleware';
+import Auth from './Auth.js';
+import AuthRepository from './AuthRepository.js';
+import PasswordService from './PasswordService.js';
+import TokenService from './TokenService.js';
+import EmailService from '../utils/EmailService.js';
+import { isValidEmail } from '../utils/Validation.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 
 async function register(body) {
@@ -74,7 +74,7 @@ function currentUser(user) {
   return TokenService.publicUser(user);
 }
 
-export {
+export default {
   register,
   login,
   forgotPassword,

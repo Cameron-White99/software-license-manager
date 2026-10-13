@@ -1,5 +1,5 @@
 import express from 'express';
-import VersionService from './VersionService';
+import VersionService from './VersionService.js';
 import { asyncHandler } from '../middleware/ErrorMiddleware.js';
 import { protect } from '../middleware/AuthMiddleware.js';
 import { isAdmin } from '../middleware/RoleMiddleware.js';

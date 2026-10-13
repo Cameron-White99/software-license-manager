@@ -6,11 +6,6 @@ import { protect } from '../middleware/AuthMiddleware.js';
 import { asyncHandler } from '../middleware/ErrorMiddleware.js';
 
 const router = express.Router();
-
-/**
- * SLM-196: Get feedback history of the logged-in user.
- * GET /api/feedback/my
- */
 router.get(
   '/my',
   protect,
@@ -24,10 +19,6 @@ router.get(
   })
 );
 
-/**
- * SLM-181: Submit feedback for a software version.
- * POST /api/feedback
- */
 router.post(
   '/',
   protect,

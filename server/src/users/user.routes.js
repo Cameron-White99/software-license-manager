@@ -1,9 +1,9 @@
 import express from 'express';
-import UserService from './UserService';
-import { asyncHandler } from '../middleware/ErrorMiddleware';
-import { protect } from '../middleware/AuthMiddleware';
-import { isAdmin } from '../middleware/RoleMiddleware';
-import { ok, created } from '../utils/ApiResponse';
+import UserService from './UserService.js';
+import { asyncHandler } from '../middleware/ErrorMiddleware.js';
+import { protect } from '../middleware/AuthMiddleware.js';
+import { isAdmin } from '../middleware/RoleMiddleware.js';
+import { ok, created } from '../utils/ApiResponse.js';
 
 
 const router = express.Router();

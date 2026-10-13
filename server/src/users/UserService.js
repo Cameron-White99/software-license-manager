@@ -1,9 +1,9 @@
-import UserRepository from './UserRepository';
-import UserFacade from './UserFacade';
-import PasswordService from '../auth/PasswordService';
-import TokenService from '../auth/TokenService';
-import { isValidEmail } from '../utils/Validation';
-import { createError } from '../middleware/ErrorMiddleware';
+import UserRepository from './UserRepository.js';
+import UserFacade from './UserFacade.js';
+import PasswordService from '../auth/PasswordService.js';
+import TokenService from '../auth/TokenService.js';
+import { isValidEmail } from '../utils/Validation.js';
+import { createError } from '../middleware/ErrorMiddleware.js';
 
 async function list() {
   return UserRepository.findAll();
@@ -107,7 +107,7 @@ async function updatePassword(user, body) {
   return { message: 'Password updated.' };
 }
 
-export {
+export default {
   list,
   create,
   update,
