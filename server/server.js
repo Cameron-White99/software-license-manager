@@ -20,12 +20,15 @@ import  Database   from './src/database/Database.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CLIENT_DIST = path.join(__dirname, "../../client/dist");
+const CLIENT_DIST = path.join(__dirname, "../client/dist");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// Public liveness probe used by the CI/CD health check.
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/api/versions', versionRoute);
 app.use('/api/auth', authRoutes);
