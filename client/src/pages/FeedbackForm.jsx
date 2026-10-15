@@ -1,13 +1,15 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import {
+  fetchFeedbackVersions,
+  fetchMyFeedback,
+  submitFeedback,
+} from '../api/feedback.js';
 
-import { fetchFeedbackVersions, fetchMyFeedback, submitFeedback } from '../api/feedback.js';
-
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 
 export default function FeedbackForm() {
@@ -20,35 +22,29 @@ export default function FeedbackForm() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const [searchParams] = useSearchParams();
-  const versionId = searchParams.get('version_id');
+  const requestedVersionId = searchParams.get('version_id');
 
-  // SLM-162: Load software versions and previously submitted feedback.
+  // Load available versions and the user's previous feedback.
   useEffect(() => {
     let active = true;
 
-    async function loadFeedbackData() {
+    async function loadData() {
       try {
         const [versionList, feedbackList] = await Promise.all([
           fetchFeedbackVersions(),
-          fetchMyFeedback()
+          fetchMyFeedback(),
         ]);
 
-        if (!Array.isArray(versionList)) {
-          throw new Error('Unable to load software versions.');
-        }
-
-        if (!Array.isArray(feedbackList)) {
-          throw new Error('Unable to load feedback history.');
+        if (!Array.isArray(versionList) || !Array.isArray(feedbackList)) {
+          throw new Error('Unable to load feedback data.');
         }
 
         if (active) {
           setVersions(versionList);
-
           setExistingFeedback(feedbackList);
         }
       } catch (err) {
@@ -62,34 +58,53 @@ export default function FeedbackForm() {
       }
     }
 
-    loadFeedbackData();
+    loadData();
 
     return () => {
       active = false;
     };
   }, []);
 
-  // Prevent submitting feedback twice for the same software version.
-  const submittedVersionIds = new Set([]);
-
-  const availableVersions = versions.filter(
-    (item) => !submittedVersionIds.has(String(item._id))
+  // Prevent duplicate feedback for already reviewed versions.
+  const submittedIds = useMemo(
+    () =>
+      new Set(
+        existingFeedback.map((item) =>
+          String(item.version?._id || item.version)
+        )
+      ),
+    [existingFeedback]
   );
 
-  useEffect(() => {
-    if (!versionId) return;
-    const match = availableVersions.some((item) => String(item._id) === versionId);
-    if (match) setVersion(versionId);
-  }, [versionId, availableVersions]);
+  const availableVersions = useMemo(
+    () =>
+      versions.filter(
+        (item) => !submittedIds.has(String(item._id))
+      ),
+    [versions, submittedIds]
+  );
 
-  // SLM-162: Validate and submit feedback.
+  // Preselect a version when opened from another page.
+  useEffect(() => {
+    if (!requestedVersionId) return;
+
+    const exists = availableVersions.some(
+      (item) => String(item._id) === requestedVersionId
+    );
+
+    if (exists) {
+      setVersion(requestedVersionId);
+    }
+  }, [requestedVersionId, availableVersions]);
+
+  // Validate and submit feedback.
   async function handleSubmit(event) {
     event.preventDefault();
 
+    if (submitting) return;
+
     setError('');
     setSuccess('');
-
-    if (submitting) return;
 
     if (!version) {
       setError('Please select a software version.');
@@ -108,14 +123,14 @@ export default function FeedbackForm() {
       return;
     }
 
-    const trimmedComments = comments.trim();
+    const cleanedComments = comments.trim();
 
-    if (!trimmedComments) {
+    if (!cleanedComments) {
       setError('Please enter your feedback comments.');
       return;
     }
 
-    if (trimmedComments.length > 1000) {
+    if (cleanedComments.length > 1000) {
       setError('Feedback comments cannot exceed 1000 characters.');
       return;
     }
@@ -123,192 +138,206 @@ export default function FeedbackForm() {
     setSubmitting(true);
 
     try {
-      const createdFeedback = await submitFeedback({
+      const created = await submitFeedback({
         versionId: version,
         rating: selectedRating,
-        comments: trimmedComments
+        comments: cleanedComments,
       });
 
-      if (!createdFeedback?._id) {
+      if (!created?._id) {
         throw new Error('Invalid feedback submission response.');
       }
 
       setExistingFeedback((previous) => [
-        createdFeedback,
-        ...previous
+        created,
+        ...previous,
       ]);
 
-      // Reset form.
       setVersion('');
       setRating('');
       setComments('');
 
-      setSuccess('Your feedback was submitted successfully.');
+      setSuccess('Feedback submitted successfully.');
     } catch (err) {
-      setError(err.message || 'Failed to submit feedback.');
+      setError(err.message || 'Unable to submit feedback.');
     } finally {
       setSubmitting(false);
     }
   }
+
   return (
-    <>
-      <div className="container py-5">
-        <Card
-          className="mx-auto border-0 shadow-sm"
-          style={{ maxWidth: '620px', borderRadius: '12px' }}
-        >
-          <Card.Body className="p-4 p-md-5">
-            <h2 className="fw-semibold mb-2">
-              Version Feedback
-            </h2>
+    <div className="container py-4">
+      <div
+        className="bg-white border rounded-3 shadow-sm mx-auto"
+        style={{ maxWidth: '620px' }}
+      >
+        <div className="p-4 p-md-5">
 
-            <p className="text-secondary mb-4">
-              Share your experience with a software version.
-            </p>
+          {/* Figma-inspired blue heading */}
+          <h2 className="fw-bold mb-2 text-primary">
+            Submit Version Feedback
+          </h2>
 
-            {error && (
-              <Alert variant="danger" role="alert">
-                {error}
-              </Alert>
-            )}
+          <p className="text-secondary mb-4">
+            Share your experience with a software version.
+          </p>
 
-            {success && (
-              <Alert variant="success" role="status">
-                {success}
-              </Alert>
-            )}
+          {/* Error and success messages */}
+          {error && (
+            <Alert variant="danger" role="alert">
+              {error}
+            </Alert>
+          )}
 
-            {loading ? (
-              <div className="text-center py-5">
-                <Spinner animation="border" role="status" />
-                <p className="text-secondary mt-3 mb-0">
-                  Loading software versions...
-                </p>
-              </div>
-            ) : (
-              <Form onSubmit={handleSubmit}>
-                {/* Software Version */}
-                <Form.Group className="mb-4" controlId="feedbackVersion">
-                  <Form.Label className="fw-medium">
-                    Software Version
-                  </Form.Label>
+          {success && (
+            <Alert variant="success" role="status">
+              {success}
+            </Alert>
+          )}
 
-                  <Form.Select
-                    value={version}
-                    onChange={(event) => {
-                      setVersion(event.target.value);
-                      setError('');
-                      setSuccess('');
-                    }}
-                    disabled={submitting || availableVersions.length === 0}
-                    required
-                  >
-                    <option value="">
-                      Select software version
+          {loading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" role="status" />
+              <p className="text-secondary mt-3 mb-0">
+                Loading software versions...
+              </p>
+            </div>
+          ) : (
+            <Form onSubmit={handleSubmit}>
+
+              {/* Software Version */}
+              <Form.Group
+                className="mb-4"
+                controlId="feedbackVersion"
+              >
+                <Form.Label className="fw-semibold">
+                  Software Version
+                </Form.Label>
+
+                <Form.Select
+                  value={version}
+                  onChange={(event) => {
+                    setVersion(event.target.value);
+                    setError('');
+                    setSuccess('');
+                  }}
+                  disabled={
+                    submitting ||
+                    availableVersions.length === 0
+                  }
+                  required
+                >
+                  <option value="">
+                    Select software version
+                  </option>
+
+                  {availableVersions.map((item) => (
+                    <option
+                      key={item._id}
+                      value={item._id}
+                    >
+                      {item.software?.software_name || 'Software'}
+                      {' — '}
+                      {item.version_number}
                     </option>
+                  ))}
+                </Form.Select>
 
-                    {availableVersions.map((item) => (
-                      <option key={item._id} value={item._id}>
-                        {item.software?.software_name || 'Software'}
-                        {' — '}
-                        {item.version_number}
-                      </option>
-                    ))}
-                  </Form.Select>
+                {availableVersions.length === 0 && (
+                  <Form.Text className="text-secondary">
+                    No software versions available for new feedback.
+                  </Form.Text>
+                )}
+              </Form.Group>
 
-                  {availableVersions.length === 0 && (
-                    <Form.Text className="text-secondary">
-                      No software versions available for new feedback.
-                    </Form.Text>
-                  )}
-                </Form.Group>
+              {/* Rating */}
+              <Form.Group
+                className="mb-4"
+                controlId="feedbackRating"
+              >
+                <Form.Label className="fw-semibold">
+                  Rating Score (1–5)
+                </Form.Label>
 
-                {/* Rating */}
-                <Form.Group className="mb-4" controlId="feedbackRating">
-                  <Form.Label className="fw-medium">
-                    Rating Score (1–5)
-                  </Form.Label>
+                <Form.Select
+                  value={rating}
+                  onChange={(event) => {
+                    setRating(event.target.value);
+                    setError('');
+                    setSuccess('');
+                  }}
+                  disabled={submitting}
+                  required
+                >
+                  <option value="">
+                    Select rating
+                  </option>
+                  <option value="1">1 - Very Poor</option>
+                  <option value="2">2 - Poor</option>
+                  <option value="3">3 - Average</option>
+                  <option value="4">4 - Good</option>
+                  <option value="5">5 - Excellent</option>
+                </Form.Select>
+              </Form.Group>
 
-                  <Form.Select
-                    value={rating}
-                    onChange={(event) => {
-                      setRating(event.target.value);
-                      setError('');
-                      setSuccess('');
-                    }}
-                    disabled={submitting}
-                    required
-                  >
-                    <option value="">Select rating</option>
-                    <option value="1">1 - Very Poor</option>
-                    <option value="2">2 - Poor</option>
-                    <option value="3">3 - Average</option>
-                    <option value="4">4 - Good</option>
-                    <option value="5">5 - Excellent</option>
-                  </Form.Select>
-                </Form.Group>
+              {/* Comments */}
+              <Form.Group
+                className="mb-4"
+                controlId="feedbackComments"
+              >
+                <Form.Label className="fw-semibold">
+                  Comments
+                </Form.Label>
 
-                {/* Comments */}
-                <Form.Group className="mb-4" controlId="feedbackComments">
-                  <Form.Label className="fw-medium">
-                    Comments
-                  </Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={5}
+                  value={comments}
+                  maxLength={1000}
+                  placeholder="Write your feedback here..."
+                  disabled={submitting}
+                  onChange={(event) => {
+                    setComments(event.target.value);
+                    setError('');
+                    setSuccess('');
+                  }}
+                  required
+                />
 
-                  <Form.Control
-                    as="textarea"
-                    rows={5}
-                    value={comments}
-                    maxLength={1000}
-                    placeholder="Write your feedback here..."
-                    disabled={submitting}
-                    onChange={(event) => {
-                      setComments(event.target.value);
-                      setError('');
-                      setSuccess('');
-                    }}
-                    required
-                  />
+                <Form.Text className="text-secondary">
+                  Maximum 1000 characters.
+                </Form.Text>
+              </Form.Group>
 
-                  <div className="text-end text-secondary small mt-2">
-                    {comments.length} / 1000 characters
-                  </div>
-                </Form.Group>
+              {/* Full-width submit button */}
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-100 fw-semibold py-2"
+                disabled={
+                  submitting ||
+                  availableVersions.length === 0
+                }
+              >
+                {submitting
+                  ? 'SUBMITTING...'
+                  : 'SUBMIT FEEDBACK'}
+              </Button>
 
-                {/* Submit and History */}
-                <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                  <Button
-                    type="submit"
-                    disabled={
-                      submitting ||
-                      availableVersions.length === 0
-                    }
-                  >
-                    {submitting ? (
-                      <>
-                        <Spinner
-                          animation="border"
-                          size="sm"
-                          className="me-2"
-                        />
-                        Submitting...
-                      </>
-                    ) : (
-                      'Submit Feedback'
-                    )}
-                  </Button>
+              {/* Navigation back to feedback history */}
+              <div className="text-center mt-3">
+                <Link
+                  to="/feedback"
+                  className="text-decoration-none"
+                >
+                  View Past Feedback
+                </Link>
+              </div>
 
-                  <Link
-                    to="/feedback/history"
-                    className="text-decoration-none"
-                  >
-                    View Past Feedback
-                  </Link>
-                </div>
-              </Form>
-            )}
-          </Card.Body>
-        </Card>
+            </Form>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

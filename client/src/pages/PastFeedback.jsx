@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchMyFeedback } from '../api/feedback.js';
 
-import Card from 'react-bootstrap/Card';
 import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
@@ -24,17 +23,13 @@ export default function PastFeedback() {
           throw new Error('Invalid feedback history response.');
         }
 
-        if (active) {
-          setFeedback(data);
-        }
+        if (active) setFeedback(data);
       } catch (err) {
         if (active) {
           setError(err.message || 'Unable to load feedback history.');
         }
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
 
@@ -45,83 +40,128 @@ export default function PastFeedback() {
     };
   }, []);
 
+  function formatFeedbackDate(value) {
+    if (!value) return 'N/A';
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return 'N/A';
+
+    return date.toLocaleString('en-AU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
+
   return (
-    <>
-      <div className="container py-5" style={{ maxWidth: '900px' }}>
-        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-          <div>
-            <h2 className="fw-semibold mb-1">My Past Feedback</h2>
-            <p className="text-secondary mb-0">
-              View feedback you have submitted for software versions.
-            </p>
-          </div>
-        </div>
+    <div className="container py-4">
+      <div
+        className="bg-white border rounded-3 shadow-sm mx-auto"
+        style={{ maxWidth: '760px' }}
+      >
+        <div className="p-4 p-md-5">
 
-        {error && (
-          <Alert variant="danger" role="alert">
-            {error}
-          </Alert>
-        )}
+          {/* Figma-aligned heading and action */}
+          <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+            <h2 className="fw-bold text-primary mb-0">
+              My Past Feedback
+            </h2>
 
-        {loading ? (
-          <div className="text-center py-5">
-            <Spinner animation="border" role="status" />
-            <p className="text-secondary mt-3">
-              Loading your feedback...
-            </p>
+            <Button
+              as={Link}
+              to="/feedback/new"
+              variant="primary"
+              className="px-3"
+            >
+              Add Feedback
+            </Button>
           </div>
-        ) : error ? null : feedback.length === 0 ? (
-          <Card className="border-0 shadow-sm">
-            <Card.Body className="text-center py-5">
-              <h5>No Feedback Submitted Yet</h5>
-              <p className="text-secondary">
+
+          {error && (
+            <Alert variant="danger" role="alert">
+              {error}
+            </Alert>
+          )}
+
+          {loading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" role="status" />
+              <p className="text-secondary mt-3 mb-0">
+                Loading your feedback...
+              </p>
+            </div>
+          ) : error ? null : feedback.length === 0 ? (
+            <div className="text-center py-5 border-top">
+              <h5 className="fw-semibold">
+                No Feedback Submitted Yet
+              </h5>
+              <p className="text-secondary mb-0">
                 You have not submitted feedback for any software version.
               </p>
-              <Button as={Link} to="/feedback">
-                Add Feedback
-              </Button>
-            </Card.Body>
-          </Card>
-        ) : (
-          feedback.map((item) => (
-            <Card
-              key={item._id}
-              className="mb-3 border-0 shadow-sm"
-              style={{ borderRadius: '12px' }}
-            >
-              <Card.Body className="p-4">
-                <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
-                  <div>
-                    <h5 className="fw-semibold mb-1">
-                      {item.version?.software?.software_name ||
-                        'Unknown Software'}
-                    </h5>
+            </div>
+          ) : (
+            <div className="border-top">
+              {feedback.map((item, index) => (
+                <article
+                  key={item._id}
+                  className={`py-4 ${
+                    index !== feedback.length - 1
+                      ? 'border-bottom'
+                      : ''
+                  }`}
+                >
+                  {/* Software, version and score */}
+                  <div className="d-flex flex-wrap align-items-start gap-3 mb-3">
+                    <div className="flex-grow-1">
+                      <h5 className="fw-semibold mb-0">
+                        {item.version?.software?.software_name ||
+                          'Unknown Software'}
+                      </h5>
 
-                    <div className="text-secondary small">
-                      Version: {item.version?.version_number || 'N/A'}
+                      <div className="fw-semibold small">
+                        {item.version?.version_number || 'N/A'}
+                      </div>
+                    </div>
+
+                    <span
+                      className="badge rounded-1 px-2 py-2"
+                      style={{
+                        backgroundColor: '#dbeafe',
+                        color: '#0d6efd',
+                      }}
+                    >
+                      Score: {item.rating}/5
+                    </span>
+
+                    <div
+                      className="small text-secondary"
+                      style={{ minWidth: '150px' }}
+                    >
+                      Submitted on{' '}
+                      {formatFeedbackDate(item.created_at)}
                     </div>
                   </div>
 
-                  <span className="badge bg-primary rounded-pill px-3 py-2">
-                    {item.rating} / 5
-                  </span>
-                </div>
-
-                <p className="mb-3" style={{ whiteSpace: 'pre-wrap' }}>
-                  {item.comments}
-                </p>
-
-                <small className="text-secondary">
-                  Submitted:{' '}
-                  {item.created_at
-                    ? new Date(item.created_at).toLocaleDateString()
-                    : 'N/A'}
-                </small>
-              </Card.Body>
-            </Card>
-          ))
-        )}
+                  {/* Feedback comments */}
+                  <p
+                    className="text-secondary mb-0"
+                    style={{
+                      whiteSpace: 'pre-wrap',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {item.comments}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
