@@ -17,6 +17,7 @@ import { errorHandler } from './src/middleware/ErrorMiddleware.js';
 
 
 import  Database   from './src/database/Database.js';
+import { startTriggers } from './src/trigger/index.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,6 +63,7 @@ const PORT = process.env.PORT || 80;
 Database.getInstance()
   .connect()
   .then(() => {
+    startTriggers();
     app.listen(PORT, () => {
       console.log(`API running on http://localhost:${PORT}`);
     });

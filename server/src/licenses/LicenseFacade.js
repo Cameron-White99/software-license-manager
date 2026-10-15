@@ -69,6 +69,7 @@ class LicenseFacade {
       const expires = new Date();
       expires.setFullYear(expires.getFullYear() + 1);
       license.expires_at = expires;
+      license.expiry_reminder_sent = false;
     }
     if (status === 'Expired') license.expires_at = new Date();
     await LicenseRepository.save(license);
