@@ -7,6 +7,7 @@ class NotificationFactory {
         Rejected: `Your request for ${softwareName} has been rejected.`,
         Expired: `Your license for ${softwareName} has been revoked.`,
         cancelled: `Your subscription for ${softwareName} has been cancelled.`,
+        expiring: `Your license for ${softwareName} expires within 24 hours.`,
       };
   
       const message = messages[type];
