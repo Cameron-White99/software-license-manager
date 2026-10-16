@@ -19,6 +19,12 @@ function create(data) {
   return Feedback.create(data);
 }
 
+function findByVersionIds(versionIds) {
+  return Feedback.find({ version: { $in: versionIds } })
+    .populate('user', 'full_name email')
+    .sort({ created_at: -1 });
+}
+
 function findByUser(userId) {
   return Feedback.find({ user: userId })
     .populate({
@@ -37,6 +43,7 @@ function deleteByUser(userId) {
 }
 
 export default {
+  findByVersionIds,
   findByUserAndVersion,
   existsByUserAndVersion,
   create,

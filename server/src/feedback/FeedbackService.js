@@ -8,7 +8,12 @@ function getMyFeedback(userId) {
   return FeedbackFacade.listForUser(userId);
 }
 
+function getSoftwareFeedback(softwareId) {
+  return FeedbackFacade.listForSoftware(softwareId);
+}
+
 export default {
   createFeedback,
   getMyFeedback,
+  getSoftwareFeedback,
 };
