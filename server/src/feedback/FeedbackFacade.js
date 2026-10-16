@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import FeedbackRepository from './FeedbackRepository.js';
+import SoftwareRepository from '../software/SoftwareRepository.js';
 import VersionRepository from '../versions/VersionRepository.js';
 import { createError } from '../middleware/ErrorMiddleware.js';
 
@@ -67,6 +68,20 @@ class FeedbackFacade {
 
       throw error;
     }
+  }
+
+  async listForSoftware(softwareId) {
+    if (!mongoose.isValidObjectId(softwareId)) {
+      throw createError('Invalid id.', 400);
+    }
+
+    const software = await SoftwareRepository.findActiveById(softwareId);
+    if (!software) {
+      throw createError('Software not found.', 404);
+    }
+
+    const versions = await VersionRepository.findBySoftware(software._id);
+    return FeedbackRepository.findByVersionIds(versions.map((version) => version._id));
   }
 
   listForUser(userId) {
