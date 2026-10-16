@@ -77,10 +77,17 @@ jobs:
   # the runner workspace. The earlier version in the software-license-manager
   # folder is never touched, and runs under a different pm2 app name.
   deploy:
-    name: Deploy to EC2
+    name: Deploy to EC2 (${{ matrix.runner }})
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: self-hosted
+    # One deploy job per instance behind the load balancer, each pinned to its
+    # own runner by label, so every instance gets every release. A failure on
+    # one instance must not cancel the deploy to the other.
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ip-172-31-104-227, ip-172-31-68-0]
+    runs-on: [self-hosted, "${{ matrix.runner }}"]
     env:
       # Override with a repository variable DEPLOY_DIR if the instance user
       # is not "ubuntu".

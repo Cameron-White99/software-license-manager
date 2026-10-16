@@ -17,6 +17,7 @@ const licenseSchema = new mongoose.Schema({
     ],
   },
   version_number: { type: mongoose.Schema.Types.ObjectId, ref: 'software_version' },
+  expiry_reminder_sent: { type: Boolean, default: false },
 });
 
 export default mongoose.model('license', licenseSchema);

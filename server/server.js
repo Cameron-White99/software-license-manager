@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
+import os from "os";
 import { fileURLToPath } from "url";
 import versionRoute from './src/versions/version.routes.js';
 import authRoutes from './src/auth/auth.routes.js';
@@ -17,6 +18,7 @@ import { errorHandler } from './src/middleware/ErrorMiddleware.js';
 
 
 import  Database   from './src/database/Database.js';
+import { startTriggers } from './src/trigger/index.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,9 +28,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-// Public liveness probe used by the CI/CD health check.
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (req, res) =>
+  res.json({ status: 'ok', instance: os.hostname() }));
 
 app.use('/api/versions', versionRoute);
 app.use('/api/auth', authRoutes);
@@ -62,6 +63,7 @@ const PORT = process.env.PORT || 80;
 Database.getInstance()
   .connect()
   .then(() => {
+    startTriggers();
     app.listen(PORT, () => {
       console.log(`API running on http://localhost:${PORT}`);
     });

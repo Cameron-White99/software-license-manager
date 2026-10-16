@@ -56,6 +56,20 @@ function deleteByUser(userId) {
   return License.deleteMany({ user: userId });
 }
 
+function findDueForExpiryReminder(withinMs) {
+  const now = new Date();
+  const until = new Date(now.getTime() + withinMs);
+  return License.find({
+    status: 'Approved',
+    expires_at: { $gt: now, $lte: until },
+    expiry_reminder_sent: { $ne: true },
+  }).populate('assigned_software', 'software_name');
+}
+
+function markExpiryReminderSent(id) {
+  return License.findByIdAndUpdate(id, { expiry_reminder_sent: true });
+}
+
 export default {
   findByUser,
   findAll,
@@ -68,4 +82,6 @@ export default {
   deleteById,
   existsForVersion,
   deleteByUser,
+  findDueForExpiryReminder,
+  markExpiryReminderSent,
 };
