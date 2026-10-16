@@ -32,11 +32,15 @@ function findByUser(userId) {
     .sort({ created_at: -1 });
 }
 
+function deleteByUser(userId) {
+  return Feedback.deleteMany({ user: userId });
+}
 
 export default {
   findByUserAndVersion,
   existsByUserAndVersion,
   create,
-  findByUser
+  findByUser,
+  deleteByUser
 };
 

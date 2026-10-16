@@ -10,8 +10,12 @@ function insertMany(docs) {
   return Notification.insertMany(docs);
 }
 
+function deleteByUser(userId) {
+  return Notification.deleteMany({ user: userId });
+}
 export default {
   findByUser,
   create,
   insertMany,
+  deleteByUser
 };
